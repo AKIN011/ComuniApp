@@ -12,11 +12,11 @@ const categoryMenuItems = [
 ] as const;
 
 const hogarSubcategories = [
-  "Electricistas",
-  "Plomeros",
-  "Cerrajeros",
-  "Limpieza",
-  "Jardinería",
+  { label: "Electricistas", path: "/categorias/electricistas" },
+  { label: "Plomeros", path: null },
+  { label: "Cerrajeros", path: null },
+  { label: "Limpieza", path: null },
+  { label: "Jardinería", path: null },
 ] as const;
 
 const userMenuItems = [
@@ -158,13 +158,16 @@ export function DashboardHeader() {
                     >
                       <ul className="flex flex-col gap-4">
                         {hogarSubcategories.map((sub) => (
-                          <li key={sub}>
+                          <li key={sub.label}>
                             <button
                               type="button"
                               className="w-full text-left font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#334155] transition-colors hover:text-[#2d5bff]"
-                              onClick={closeCategories}
+                              onClick={() => {
+                                closeCategories();
+                                if (sub.path) navigate(sub.path);
+                              }}
                             >
-                              {sub}
+                              {sub.label}
                             </button>
                           </li>
                         ))}
