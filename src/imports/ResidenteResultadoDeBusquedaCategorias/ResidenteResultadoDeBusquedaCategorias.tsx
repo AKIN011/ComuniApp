@@ -11,8 +11,8 @@ function Container() {
 
 function SearchSection() {
   return (
-    <div className="content-stretch flex flex-col h-[76px] items-start max-w-[768px] relative shrink-0 w-[768px]" data-name="Search Section">
-      <Container />
+    <div className="content-stretch flex flex-col h-[76px] items-start max-w-[768px] relative shrink-0 w-full" data-name="Search Section">
+      <Container/>{/* eslint-disable-line react/no-unescaped-entities */} {/* eslint-disable-line react/no-danger */}
     </div>
   );
 }
@@ -358,7 +358,7 @@ function QuickFilters() {
 
 function AsideSidebarFilters() {
   return (
-    <div className="content-stretch flex flex-col gap-[40px] h-[587px] items-start relative shrink-0 w-[288px]" data-name="Aside - Sidebar Filters">
+    <div className="content-stretch flex flex-col gap-[40px] items-start relative shrink-0 w-[288px]" data-name="Aside - Sidebar Filters">
       <Categories />
       <PriceRange />
       <QuickFilters />
@@ -978,35 +978,34 @@ function ResultsGrid() {
 
 function Container1() {
   return (
-    <div className="col-1 content-stretch flex gap-[40px] h-[616px] items-start ml-0 mt-0 relative row-1 w-full" data-name="Container">
+    <div className="content-stretch flex gap-[40px] items-start relative shrink-0 w-full" data-name="Container">
       <AsideSidebarFilters />
       <ResultsGrid />
     </div>
   );
 }
 
-function Group() {
+function PageTitle() {
   return (
-    <div className="grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0 w-full">
-      <Container1 />
+    <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Page Title">
+      <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[32px] w-full">
+        <p className="leading-[40px]">Resultados para Electricistas</p>
+      </div>
     </div>
   );
 }
 
 function Main() {
   return (
-    <div className="absolute content-stretch flex flex-col gap-[15px] h-[1176px] items-center left-0 max-w-[1280px] pb-[96px] pt-[48px] px-[24px] right-0 top-[94px]" data-name="Main">
-      <SearchSection />
-      <Heading1 />
-      <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold h-[24px] justify-center leading-[0] min-w-full relative shrink-0 text-[#0d1c2e] text-[18px] w-[min-content]">
-        <p className="leading-[28px]">Categorias</p>
-      </div>
-      <Group />
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[16px] text-center text-white whitespace-nowrap">
-        <p className="leading-[24px]">Buscar</p>
-      </div>
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[16px] text-center text-white whitespace-nowrap">
-        <p className="leading-[24px]">Buscar</p>
+    <div className="absolute h-[1182px] left-0 right-0 top-[88px]" data-name="Main">
+      <div className="content-stretch flex flex-col gap-[15px] items-start pb-[96px] pt-[48px] px-[32px] relative size-full">
+        <PageTitle />
+        <SearchSection />
+        <Heading1 />
+        <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold h-[24px] justify-center leading-[0] relative shrink-0 text-[#0d1c2e] text-[18px] w-full">
+          <p className="leading-[28px]">Categorias</p>
+        </div>
+        <Container1 />
       </div>
     </div>
   );
@@ -1094,7 +1093,7 @@ function Container49() {
 
 function Footer() {
   return (
-    <div className="absolute bg-[#eff4ff] content-stretch flex h-[117px] items-center justify-between left-0 max-w-[1280px] px-[32px] py-[48px] right-0 top-[1116px]" data-name="Footer">
+    <div className="absolute bg-[#eff4ff] content-stretch flex items-center justify-between left-0 max-w-[1280px] mx-auto px-[32px] py-[48px] right-0 rounded-tl-[48px] rounded-tr-[48px] top-[1110px]" data-name="Footer">
       <Container46 />
       <Container49 />
     </div>
@@ -1133,34 +1132,46 @@ function Component1() {
   );
 }
 
-function Component() {
+function HeaderNavBar() {
   return (
-    <div className="absolute backdrop-blur-[2px] bg-[rgba(248,249,255,0.8)] content-stretch flex h-[90px] items-center justify-between left-0 px-[20px] rounded-[999px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] top-0 w-[1280px]" data-name>
-      <RouterLink to="/dashboard" className="h-[35px] relative shrink-0 w-[176px]" data-name="IMG comuniapp 1">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[141.49%] left-[-0.1%] max-w-none top-[-20.58%] w-full" src={imgImgComuniapp1} />
+    <div className="backdrop-blur-[2px] bg-[rgba(248,249,255,0.8)] max-w-[1280px] relative rounded-[999px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] shrink-0 w-full" data-name="Header - TopNavBar">
+      <div className="flex flex-row items-center max-w-[inherit] size-full">
+        <div className="content-stretch flex h-[90px] items-center justify-between max-w-[inherit] px-[20px] relative size-full">
+          <RouterLink to="/dashboard" className="h-[35px] relative shrink-0 w-[176px]" data-name="IMG comuniapp 1">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <img alt="" className="absolute h-[141.49%] left-[-0.1%] max-w-none top-[-20.58%] w-full" src={imgImgComuniapp1} />
+            </div>
+          </RouterLink>
+          <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[#0d1c2e] text-[16px] tracking-[-0.4px] w-[73px]">
+            <p className="leading-[24px]">Servicios</p>
+          </div>
+          <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[#0d1c2e] text-[16px] tracking-[-0.4px] w-[129px]">
+            <p className="leading-[24px]">Emprendedores</p>
+          </div>
+          <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[#0d1c2e] text-[16px] tracking-[-0.4px] w-[87px]">
+            <p className="leading-[24px]">Categorías</p>
+          </div>
+          <Component1 />
+          <div className="bg-[#cbd5e1] h-[35px] overflow-clip relative rounded-[100px] shrink-0 w-[36px]" data-name="Generic avatar">
+            <div className="absolute bottom-[10.92%] left-[14.77%] right-[14.77%] top-1/4" data-name="Avatar Placeholder">
+              <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25.3657 22.4281">
+                <g id="Avatar Placeholder">
+                  <path clipRule="evenodd" d={svgPaths.p178d40c0} fill="var(--fill-0, #434656)" fillRule="evenodd" />
+                  <path d={svgPaths.p9206270} fill="var(--fill-0, #434656)" />
+                </g>
+              </svg>
+            </div>
+          </div>
         </div>
-      </RouterLink>
-      <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[#0d1c2e] text-[16px] tracking-[-0.4px] w-[73px]">
-        <p className="leading-[24px]">Servicios</p>
       </div>
-      <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[#0d1c2e] text-[16px] tracking-[-0.4px] w-[129px]">
-        <p className="leading-[24px]">Emprendedores</p>
-      </div>
-      <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[#0d1c2e] text-[16px] tracking-[-0.4px] w-[87px]">
-        <p className="leading-[24px]">Categorías</p>
-      </div>
-      <Component1 />
-      <div className="bg-[#cbd5e1] h-[35px] overflow-clip relative rounded-[100px] shrink-0 w-[36px]" data-name="Generic avatar">
-        <div className="absolute bottom-[10.92%] left-[14.77%] right-[14.77%] top-1/4" data-name="Avatar Placeholder">
-          <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25.3657 22.4281">
-            <g id="Avatar Placeholder">
-              <path clipRule="evenodd" d={svgPaths.p178d40c0} fill="var(--fill-0, #434656)" fillRule="evenodd" />
-              <path d={svgPaths.p9206270} fill="var(--fill-0, #434656)" />
-            </g>
-          </svg>
-        </div>
-      </div>
+    </div>
+  );
+}
+
+function HeaderNavBarMargin() {
+  return (
+    <div className="absolute content-stretch flex flex-col items-center left-0 pt-[16px] right-0 top-0" data-name="Header - TopNavBar:margin">
+      <HeaderNavBar />
     </div>
   );
 }
@@ -1170,10 +1181,7 @@ export default function ResidenteResultadoDeBusquedaCategorias() {
     <div className="relative size-full" style={{ backgroundImage: "linear-gradient(90deg, rgb(248, 249, 255) 0%, rgb(248, 249, 255) 100%), linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%)" }} data-name="RESIDENTE RESULTADO DE BUSQUEDA CATEGORIAS">
       <Main />
       <Footer />
-      <Component />
-      <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] left-[calc(50%-74.5px)] not-italic text-[32px] text-black text-center top-[calc(50%-424.5px)] whitespace-nowrap">
-        <p className="leading-[24px]">Resultados para Electricistas</p>
-      </div>
+      <HeaderNavBarMargin />
     </div>
   );
 }

@@ -153,7 +153,7 @@ export default function LoginPage() {
               ¿No tienes una cuenta?{" "}
               <Link
                 className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#2d5bff] transition-colors hover:text-[#1a4de8]"
-                to="/"
+                to="/registro"
               >
                 Regístrate en su lugar
               </Link>

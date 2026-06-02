@@ -1283,8 +1283,21 @@ function Container61() {
 }
 
 function Button8() {
+  const navigate = useNavigate();
   return (
-    <div className="bg-[#2d5bff] content-stretch flex flex-col items-center justify-center px-[32px] py-[12px] relative rounded-[9999px] cursor-pointer transition-all duration-200 hover:bg-[#1a4de8] hover:shadow-[0px_12px_20px_-3px_rgba(0,64,223,0.3)] active:scale-[0.98]" data-name="Button">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => navigate("/registro")}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate("/registro");
+        }
+      }}
+      className="bg-[#2d5bff] content-stretch flex flex-col items-center justify-center px-[32px] py-[12px] relative rounded-[9999px] cursor-pointer transition-all duration-200 hover:bg-[#1a4de8] hover:shadow-[0px_12px_20px_-3px_rgba(0,64,223,0.3)] active:scale-[0.98]"
+      data-name="Button"
+    >
       <div className="absolute bg-[rgba(255,255,255,0)] inset-[0_6.31px_2.4px_0] rounded-[9999px] shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)]" data-name="Button:shadow" />
       <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[#efefff] text-[16px] text-center whitespace-nowrap">
         <p className="leading-[24px]">Registrate</p>
