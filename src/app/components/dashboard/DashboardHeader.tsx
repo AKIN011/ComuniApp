@@ -222,6 +222,7 @@ export function DashboardHeader() {
                         onClick={() => {
                           setUserMenuOpen(false);
                           if (item.action === "logout") navigate("/login");
+                          if (item.action === "profile") navigate("/perfil/editar");
                         }}
                       >
                         {item.label}
