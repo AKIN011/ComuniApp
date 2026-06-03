@@ -8,6 +8,8 @@ import ResidenteRegistro from "../pages/ResidenteRegistro";
 import ResidenteCrearPerfil from "../pages/ResidenteCrearPerfil";
 import { EditProfile } from "../pages/EditProfile";
 import { EditProfileSuccess } from "../pages/EditProfileSuccess";
+import EmprendedorCrearServicios from "../pages/EmprendedorCrearServicios";
+import EmprendedorEditarServicios from "../pages/EmprendedorEditarServicios";
 
 const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
@@ -19,6 +21,14 @@ const router = createBrowserRouter([
   { path: "/registro/crear-perfil", element: <ResidenteCrearPerfil /> },
   { path: "/perfil/editar", element: <EditProfile /> },
   { path: "/perfil/editar/exito", element: <EditProfileSuccess /> },
+  {
+    path: "/emprendedor/crear-servicios",
+    element: <EmprendedorCrearServicios />,
+  },
+  {
+    path: "/emprendedor/editar-servicios",
+    element: <EmprendedorEditarServicios />,
+  },
 ]);
 
 export default function App() {
