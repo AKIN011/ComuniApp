@@ -6,18 +6,20 @@ type ProfileConfirmationModalProps = {
   message: string;
   onClose?: () => void;
   homePath?: string;
+  buttonLabel?: string;
 };
 
 export function ProfileConfirmationModal({
   message,
   onClose,
-  homePath = "/dashboard",
+  homePath,
+  buttonLabel = "Ir al Home",
 }: ProfileConfirmationModalProps) {
   const navigate = useNavigate();
 
-  const goHome = () => {
+  const handleAction = () => {
     onClose?.();
-    navigate(homePath);
+    if (homePath) navigate(homePath);
   };
 
   return (
@@ -43,10 +45,10 @@ export function ProfileConfirmationModal({
         </p>
         <button
           type="button"
-          onClick={goHome}
+          onClick={handleAction}
           className="relative mt-10 flex w-full cursor-pointer items-center justify-center rounded-[9999px] bg-gradient-to-r from-[#0040df] to-[#2d5bff] py-4 font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-white transition-opacity hover:opacity-90"
         >
-          Ir al Home
+          {buttonLabel}
         </button>
       </div>
     </div>

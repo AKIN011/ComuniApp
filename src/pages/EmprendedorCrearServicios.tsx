@@ -16,6 +16,10 @@ import {
   Lightbulb,
   Store,
 } from "lucide-react";
+import {
+  fileToDataUrl,
+  savePublishedService,
+} from "../app/utils/emprendedorServicioStorage";
 
 function randomServiceId() {
   return Math.floor(1000 + Math.random() * 9000);
@@ -251,7 +255,13 @@ function ActiveToggle({
   );
 }
 
-function PublishSuccessModal({ serviceId }: { serviceId: number }) {
+function PublishSuccessModal({
+  serviceId,
+  onVerServicios,
+}: {
+  serviceId: number;
+  onVerServicios: () => void;
+}) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(248,249,255,0.35)] p-6 backdrop-blur-[14px]"
@@ -271,9 +281,10 @@ function PublishSuccessModal({ serviceId }: { serviceId: number }) {
         </p>
         <button
           type="button"
+          onClick={onVerServicios}
           className="mt-10 flex w-full items-center justify-center rounded-[9999px] bg-gradient-to-r from-[#0040df] to-[#2d5bff] py-4 font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-opacity hover:opacity-90"
         >
-          Ir al Home
+          Ver servicios
         </button>
       </div>
     </div>
@@ -310,6 +321,7 @@ function PageFooter() {
 }
 
 export default function EmprendedorCrearServicios() {
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [storeMenuOpen, setStoreMenuOpen] = useState(false);
@@ -357,7 +369,7 @@ export default function EmprendedorCrearServicios() {
     if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!title.trim()) {
       setStatusMessage("Ingresa un título para el servicio.");
       return;
@@ -366,9 +378,32 @@ export default function EmprendedorCrearServicios() {
       setStatusMessage("Selecciona una categoría.");
       return;
     }
+    if (images.length === 0) {
+      setStatusMessage("Agrega al menos una imagen del servicio.");
+      return;
+    }
+
+    const serviceId = randomServiceId();
+    const imageUrl = await fileToDataUrl(images[0].file);
+
+    savePublishedService({
+      id: serviceId,
+      title: title.trim(),
+      description: description.trim(),
+      category,
+      subcategory,
+      active,
+      imageUrl,
+    });
+
     setStatusMessage(null);
-    setPublishedServiceId(randomServiceId());
+    setPublishedServiceId(serviceId);
     setShowPublishModal(true);
+  };
+
+  const handleVerServicios = () => {
+    setShowPublishModal(false);
+    navigate("/emprendedor/resultado-cargue-serv");
   };
 
   const handleDraft = () => {
@@ -609,7 +644,10 @@ export default function EmprendedorCrearServicios() {
       <PageFooter />
 
       {showPublishModal && publishedServiceId !== null && (
-        <PublishSuccessModal serviceId={publishedServiceId} />
+        <PublishSuccessModal
+          serviceId={publishedServiceId}
+          onVerServicios={handleVerServicios}
+        />
       )}
     </div>
   );

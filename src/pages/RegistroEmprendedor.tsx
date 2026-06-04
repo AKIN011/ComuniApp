@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 import {
   Eye,
   EyeOff,
@@ -7,12 +7,12 @@ import {
   Mail,
   Shield,
   ShieldCheck,
-  Store,
   Users,
 } from "lucide-react";
 import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
+import { ProfileConfirmationModal } from "../app/components/ProfileConfirmationModal";
 
-function LoginFooter() {
+function RegistroFooter() {
   return (
     <footer className="mt-auto w-full bg-[#eff4ff] px-8 py-12">
       <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-6">
@@ -42,9 +42,20 @@ function LoginFooter() {
   );
 }
 
-export default function LoginPage() {
+export default function RegistroEmprendedor() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  const handleRegister = (e: FormEvent) => {
+    e.preventDefault();
+    setShowWelcomeModal(true);
+  };
+
+  const continueToProfile = () => {
+    setShowWelcomeModal(false);
+    navigate("/registro/emprendedor/crear-perfil");
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f9ff]">
@@ -57,24 +68,18 @@ export default function LoginPage() {
           <div className="rounded-[24px] bg-white px-8 py-10 shadow-[0px_20px_40px_0px_rgba(13,28,46,0.06)]">
             <div className="mb-8 text-center">
               <h1 className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[28px] font-extrabold leading-[36px] tracking-[-0.5px] text-[#0d1c2e]">
-                Bienvenido de nuevo
+                Bienvenido
               </h1>
               <p className="mt-2 font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#64748b]">
-                Por favor, introduzca sus datos para iniciar sesión.
+                Por favor, introduzca sus datos para registrarse.
               </p>
             </div>
 
-            <form
-              className="flex flex-col gap-5"
-              onSubmit={(e) => {
-                e.preventDefault();
-                navigate("/dashboard");
-              }}
-            >
+            <form className="flex flex-col gap-5" onSubmit={handleRegister}>
               <div className="flex flex-col gap-2">
                 <label
                   className="font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#334155]"
-                  htmlFor="email"
+                  htmlFor="emprendedor-email"
                 >
                   Dirección de correo electrónico
                 </label>
@@ -84,9 +89,10 @@ export default function LoginPage() {
                     className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#94a3b8]"
                   />
                   <input
-                    id="email"
+                    id="emprendedor-email"
                     type="email"
                     autoComplete="email"
+                    required
                     placeholder="name@company.com"
                     className="h-[52px] w-full rounded-[14px] border-none bg-[#eef4fc] pl-12 pr-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30"
                   />
@@ -97,7 +103,7 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between gap-2">
                   <label
                     className="font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#334155]"
-                    htmlFor="password"
+                    htmlFor="emprendedor-password"
                   >
                     Contraseña
                   </label>
@@ -114,9 +120,10 @@ export default function LoginPage() {
                     className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#94a3b8]"
                   />
                   <input
-                    id="password"
+                    id="emprendedor-password"
                     type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
+                    autoComplete="new-password"
+                    required
                     placeholder="••••••••"
                     className="h-[52px] w-full rounded-[14px] border-none bg-[#eef4fc] pl-12 pr-12 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30"
                   />
@@ -141,7 +148,7 @@ export default function LoginPage() {
                 type="submit"
                 className="mt-2 h-[52px] w-full cursor-pointer rounded-[9999px] bg-[#2d5bff] font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[16px] font-bold leading-[24px] text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.25),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-all duration-200 hover:bg-[#1a4de8] active:scale-[0.98]"
               >
-                Iniciar sesión
+                Registrarse
               </button>
             </form>
 
@@ -150,27 +157,11 @@ export default function LoginPage() {
             </p>
 
             <p className="mt-4 text-center font-['Inter:Regular',sans-serif] text-[14px] leading-[22px] text-[#64748b]">
-              ¿No tienes una cuenta?{" "}
-              <Link
-                className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#2d5bff] transition-colors hover:text-[#1a4de8]"
-                to="/registro"
-              >
-                Regístrate en su lugar
-              </Link>
+              ¿Ya tienes una cuenta?{" "}
+              <span className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#2d5bff]">
+                Inicia sesión
+              </span>
             </p>
-
-            <div className="mt-8 border-t border-[#e2e8f0] pt-8">
-              <p className="text-center font-['Inter:Medium',sans-serif] text-[11px] font-medium uppercase leading-[16px] tracking-[0.08em] text-[#94a3b8]">
-                ¿Eres propietario de un negocio local?
-              </p>
-              <Link
-                to="/registro/emprendedor"
-                className="mt-4 flex h-[48px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[#fce8d5] font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold leading-[22px] text-[#9a6b45] no-underline transition-all duration-200 hover:bg-[#f9dcc0] active:scale-[0.98]"
-              >
-                <Store className="size-5" strokeWidth={2} />
-                Inicia como emprendedor
-              </Link>
-            </div>
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-10 text-[#cbd5e1]">
@@ -181,7 +172,15 @@ export default function LoginPage() {
         </main>
       </div>
 
-      <LoginFooter />
+      <RegistroFooter />
+
+      {showWelcomeModal && (
+        <ProfileConfirmationModal
+          message="¡Bienvenido! Continúa para completar tu perfil de emprendedor en ComuniApp."
+          buttonLabel="Continuar"
+          onClose={continueToProfile}
+        />
+      )}
     </div>
   );
 }

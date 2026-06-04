@@ -28,6 +28,12 @@ export default function HomePage() {
         >
           ⚠ DEV → Editar servicios (emprendedor)
         </Link>
+        <Link
+          to="/emprendedor/editar-perfil"
+          className="rounded-lg border-4 border-dashed border-[#f59e0b] bg-[#fff7ed] px-6 py-3 font-['Inter:Bold',sans-serif] text-[14px] font-bold uppercase tracking-wide text-[#c2410c] shadow-[0_0_0_4px_rgba(245,158,11,0.25)] ring-2 ring-[#fbbf24] transition-transform hover:scale-105"
+        >
+          ⚠ DEV → Editar perfil (emprendedor)
+        </Link>
       </div>
       {/* ======================== FIN DEV TEMP ============================ */}
     </div>
