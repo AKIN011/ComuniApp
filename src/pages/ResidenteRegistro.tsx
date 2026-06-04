@@ -321,14 +321,19 @@ function Container15() {
   );
 }
 
-function Button1() {
+function Button1({ onEmprendedor }: { onEmprendedor: () => void }) {
   return (
-    <button className="bg-[#ffddb8] cursor-pointer hover:opacity-80 transition-opacity border-none outline-none opacity-60 relative rounded-[32px] shrink-0 w-full" data-name="Button">
-      <div className="flex flex-row items-center justify-center size-full">
-        <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[12px] items-center justify-center px-[16px] py-[14px] relative size-full">
+    <button
+      type="button"
+      onClick={onEmprendedor}
+      className="relative w-full shrink-0 cursor-pointer rounded-[32px] border-none bg-[#ffddb8] outline-none transition-opacity hover:opacity-80"
+      data-name="Button"
+    >
+      <div className="flex size-full flex-row items-center justify-center">
+        <div className="relative flex size-full content-stretch items-center justify-center gap-[12px] border-0 border-solid border-[transparent] bg-clip-padding px-[16px] py-[14px]">
           <Container15 />
-          <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#2a1700] text-[16px] text-center whitespace-nowrap">
-            <p className="leading-[24px]">Únete como emprendedor</p>
+          <div className="relative flex shrink-0 flex-col justify-center [word-break:break-word] font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold not-italic leading-[0] text-[#2a1700]">
+            <p className="whitespace-nowrap leading-[24px]">Únete como emprendedor</p>
           </div>
         </div>
       </div>
@@ -336,28 +341,34 @@ function Button1() {
   );
 }
 
-function HorizontalBorder() {
+function HorizontalBorder({ onEmprendedor }: { onEmprendedor: () => void }) {
   return (
     <div className="content-stretch flex flex-col gap-[16px] items-start pt-[17px] relative shrink-0 w-full" data-name="HorizontalBorder">
       <div aria-hidden className="absolute border-[rgba(196,197,217,0.1)] border-solid border-t inset-0 pointer-events-none" />
       <Container14 />
-      <Button1 />
+      <Button1 onEmprendedor={onEmprendedor} />
     </div>
   );
 }
 
-function SecondaryActions() {
+function SecondaryActions({ onEmprendedor }: { onEmprendedor: () => void }) {
   return (
     <div className="relative shrink-0 w-full" data-name="Secondary Actions">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col gap-[16px] items-start pt-[8px] relative size-full">
         <Paragraph />
-        <HorizontalBorder />
+        <HorizontalBorder onEmprendedor={onEmprendedor} />
       </div>
     </div>
   );
 }
 
-function LoginCard({ onRegister }: { onRegister: () => void }) {
+function LoginCard({
+  onRegister,
+  onEmprendedor,
+}: {
+  onRegister: () => void;
+  onEmprendedor: () => void;
+}) {
   return (
     <div className="bg-white drop-shadow-[0px_20px_20px_rgba(13,28,46,0.06)] relative rounded-[48px] shrink-0 w-full" data-name="Login Card">
       <div aria-hidden className="absolute border border-[rgba(196,197,217,0.1)] border-solid inset-0 pointer-events-none rounded-[48px]" />
@@ -365,7 +376,7 @@ function LoginCard({ onRegister }: { onRegister: () => void }) {
         <Container4 />
         <Form onRegister={onRegister} />
         <Divider />
-        <SecondaryActions />
+        <SecondaryActions onEmprendedor={onEmprendedor} />
       </div>
     </div>
   );
@@ -418,11 +429,17 @@ function TrustBadges() {
   );
 }
 
-function Container({ onRegister }: { onRegister: () => void }) {
+function Container({
+  onRegister,
+  onEmprendedor,
+}: {
+  onRegister: () => void;
+  onEmprendedor: () => void;
+}) {
   return (
     <div className="content-stretch flex flex-col gap-[40px] items-start w-full max-w-[448px] relative shrink-0" data-name="Container">
       <LogoAnchor />
-      <LoginCard onRegister={onRegister} />
+      <LoginCard onRegister={onRegister} onEmprendedor={onEmprendedor} />
       <TrustBadges />
     </div>
   );
@@ -430,15 +447,17 @@ function Container({ onRegister }: { onRegister: () => void }) {
 
 function MainTopAppBarSuppressedForLoginJourneyAsPerSemanticShellMandate({
   onRegister,
+  onEmprendedor,
 }: {
   onRegister: () => void;
+  onEmprendedor: () => void;
 }) {
   return (
     <div className="relative shrink-0 w-full flex-grow z-[2] min-h-[calc(100vh-152px)] flex flex-col justify-center" data-name="Main - TopAppBar Suppressed for Login Journey as per Semantic Shell Mandate">
       <div className="flex flex-row items-center justify-center overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-center justify-center p-[24px] relative size-full">
            <div className="absolute bg-[#e6eeff] blur-[60px] bottom-1/2 left-[-5%] opacity-60 right-[65%] rounded-[9999px] top-[-10%]" data-name="Minimalist Background Decoration" />
-          <Container onRegister={onRegister} />
+          <Container onRegister={onRegister} onEmprendedor={onEmprendedor} />
         </div>
       </div>
     </div>
@@ -532,9 +551,16 @@ export default function ResidenteRegistro() {
     navigate("/registro/crear-perfil");
   };
 
+  const goToEmprendedorRegistro = () => {
+    navigate("/registro/emprendedor");
+  };
+
   return (
     <div className="content-stretch flex flex-col min-h-screen isolate items-start relative size-full" style={{ backgroundImage: "linear-gradient(90deg, rgb(248, 249, 255) 0%, rgb(248, 249, 255) 100%), linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%)" }} data-name="RESIDENTE REGISTRO 1">
-      <MainTopAppBarSuppressedForLoginJourneyAsPerSemanticShellMandate onRegister={handleRegister} />
+      <MainTopAppBarSuppressedForLoginJourneyAsPerSemanticShellMandate
+        onRegister={handleRegister}
+        onEmprendedor={goToEmprendedorRegistro}
+      />
       <FooterComponentExecutionMargin />
       {showWelcomeModal && (
         <ProfileConfirmationModal

@@ -11,6 +11,12 @@ import { EditProfile } from "../pages/EditProfile";
 import { EditProfileSuccess } from "../pages/EditProfileSuccess";
 import { GuestRoute } from "./components/GuestRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import EmprendedorCrearServicios from "../pages/EmprendedorCrearServicios";
+import EmprendedorEditarServicios from "../pages/EmprendedorEditarServicios";
+import EmprendedorEditarPerfil from "../pages/EmprendedorEditarPerfil";
+import RegistroEmprendedor from "../pages/RegistroEmprendedor";
+import CrearPerfilEmprendedor from "../pages/CrearPerfilEmprendedor";
+import EmprendResultCargueServ from "../pages/EmprendResultCargueServ";
 
 const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
@@ -47,6 +53,11 @@ const router = createBrowserRouter([
     ),
   },
   { path: "/registro", element: <ResidenteRegistro /> },
+  { path: "/registro/emprendedor", element: <RegistroEmprendedor /> },
+  {
+    path: "/registro/emprendedor/crear-perfil",
+    element: <CrearPerfilEmprendedor />,
+  },
   { path: "/registro/crear-perfil", element: <ResidenteCrearPerfil /> },
   {
     path: "/perfil/editar",
@@ -63,6 +74,22 @@ const router = createBrowserRouter([
         <EditProfileSuccess />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/emprendedor/crear-servicios",
+    element: <EmprendedorCrearServicios />,
+  },
+  {
+    path: "/emprendedor/editar-servicios",
+    element: <EmprendedorEditarServicios />,
+  },
+  {
+    path: "/emprendedor/editar-perfil",
+    element: <EmprendedorEditarPerfil />,
+  },
+  {
+    path: "/emprendedor/resultado-cargue-serv",
+    element: <EmprendResultCargueServ />,
   },
 ]);
 

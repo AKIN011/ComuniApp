@@ -509,21 +509,15 @@ export default function LoginPage() {
                 ¿Eres propietario de un negocio local?
 
               </p>
-
-              <button
-
-                type="button"
-
-                className="mt-4 flex h-[48px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[#fce8d5] font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold leading-[22px] text-[#9a6b45] transition-all duration-200 hover:bg-[#f9dcc0] active:scale-[0.98]"
-
+              <Link
+                to="/registro/emprendedor"
+                className="mt-4 flex h-[48px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[#fce8d5] font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold leading-[22px] text-[#9a6b45] no-underline transition-all duration-200 hover:bg-[#f9dcc0] active:scale-[0.98]"
               >
 
                 <Store className="size-5" strokeWidth={2} />
 
                 Inicia como emprendedor
-
-              </button>
-
+              </Link>
             </div>
 
           </div>
