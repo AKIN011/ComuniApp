@@ -1,0 +1,146 @@
+import { NavLink, Outlet } from "react-router";
+import {
+  CircleHelp,
+  LayoutGrid,
+  List,
+  Settings,
+  UserRound,
+} from "lucide-react";
+import { EMPRENDEDOR_ROUTES } from "../../../lib/emprendedorRoutes";
+
+const mainNav = [
+  {
+    to: EMPRENDEDOR_ROUTES.tablero,
+    label: "Tablero",
+    icon: LayoutGrid,
+    end: true,
+  },
+  {
+    to: EMPRENDEDOR_ROUTES.servicios,
+    label: "Listado de servicios",
+    icon: List,
+    end: true,
+  },
+  {
+    to: EMPRENDEDOR_ROUTES.editarPerfil,
+    label: "Editar mi perfil",
+    icon: UserRound,
+    end: true,
+  },
+] as const;
+
+function EmprendedorLogo() {
+  return (
+    <span className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[22px] font-extrabold leading-[28px] tracking-[-0.5px]">
+      <span className="text-[#2d5bff]">Comuni</span>
+      <span className="text-[#22c55e]">App</span>
+    </span>
+  );
+}
+
+function SidebarNavItem({
+  to,
+  label,
+  icon: Icon,
+  end,
+}: {
+  to: string;
+  label: string;
+  icon: typeof LayoutGrid;
+  end?: boolean;
+}) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-[16px] px-4 py-3 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold transition-colors ${
+          isActive
+            ? "bg-white text-[#2d5bff] shadow-[0px_2px_8px_rgba(13,28,46,0.06)]"
+            : "text-[#475569] hover:bg-white/60 hover:text-[#0d1c2e]"
+        }`
+      }
+    >
+      <Icon className="size-5 shrink-0" strokeWidth={2} />
+      {label}
+    </NavLink>
+  );
+}
+
+function EmprendedorFooter() {
+  return (
+    <footer className="mt-auto flex flex-wrap items-center justify-between gap-4 border-t border-[#e8eeff] px-8 py-6">
+      <p className="font-['Inter:Regular',sans-serif] text-[13px] text-[#94a3b8]">
+        ©ComuniApp 2026
+      </p>
+      <div className="flex flex-wrap gap-6">
+        {[
+          "Política de privacidad",
+          "Terminos de servicio",
+          "Informe de Sostenibilidad",
+        ].map((label) => (
+          <button
+            key={label}
+            type="button"
+            className="font-['Inter:Regular',sans-serif] text-[13px] text-[#94a3b8] transition-colors hover:text-[#2d5bff]"
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </footer>
+  );
+}
+
+export function EmprendedorLayout() {
+  return (
+    <div className="flex min-h-screen bg-[#f8f9ff]">
+      <aside className="flex w-[260px] shrink-0 flex-col bg-[#eef4fc] px-4 py-8">
+        <nav className="flex flex-col gap-1">
+          {mainNav.map((item) => (
+            <SidebarNavItem key={item.to} {...item} />
+          ))}
+        </nav>
+
+        <div className="mt-auto flex flex-col gap-1 pt-8">
+          <button
+            type="button"
+            className="flex items-center gap-3 rounded-[16px] px-4 py-3 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#64748b] transition-colors hover:bg-white/60"
+          >
+            <Settings className="size-4 shrink-0" />
+            Configuración
+          </button>
+          <button
+            type="button"
+            className="flex items-center gap-3 rounded-[16px] px-4 py-3 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#64748b] transition-colors hover:bg-white/60"
+          >
+            <CircleHelp className="size-4 shrink-0" />
+            Centro de ayuda
+          </button>
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex items-center justify-between border-b border-[#e8eeff] bg-white px-8 py-4">
+          <EmprendedorLogo />
+          <button
+            type="button"
+            aria-label="Perfil"
+            className="size-10 overflow-hidden rounded-full border-2 border-[#e2e8f0] bg-[#cbd5e1]"
+          >
+            <img
+              alt=""
+              className="size-full object-cover"
+              src="https://images.unsplash.com/photo-1568605114967-8130f3a36993?w=80&q=80"
+            />
+          </button>
+        </header>
+
+        <div className="flex flex-1 flex-col px-8 py-8">
+          <Outlet />
+          <EmprendedorFooter />
+        </div>
+      </div>
+    </div>
+  );
+}
