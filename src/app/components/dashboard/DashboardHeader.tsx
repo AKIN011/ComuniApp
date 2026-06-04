@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { Link, useNavigate } from "react-router";
 import { Search, User } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
 
 const navItems = ["Servicios", "Emprendedores"] as const;
 
@@ -65,6 +66,7 @@ function useClickOutside(
 
 export function DashboardHeader() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [hogarHovered, setHogarHovered] = useState(false);
@@ -221,7 +223,10 @@ export function DashboardHeader() {
                         className="w-full text-center font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#0d1c2e] underline decoration-[#0d1c2e] underline-offset-4 transition-colors hover:text-[#2d5bff] hover:decoration-[#2d5bff]"
                         onClick={() => {
                           setUserMenuOpen(false);
-                          if (item.action === "logout") navigate("/login");
+                          if (item.action === "logout") {
+                            logout();
+                            navigate("/login", { replace: true });
+                          }
                           if (item.action === "profile") navigate("/perfil/editar");
                         }}
                       >
