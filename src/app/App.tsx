@@ -1,13 +1,23 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { AuthProvider } from "../context/AuthContext";
 import HomePage from "../pages/HomePage";
+
 import LoginPage from "../pages/LoginPage";
+
+import LoginEmprendedorPage from "../pages/LoginEmprendedorPage";
+
 import ResidentDashboardPage from "../pages/ResidentDashboardPage";
+
 import SearchResultsPage from "../pages/SearchResultsPage";
+
 import ServiceDetailsPage from "../pages/ServiceDetailsPage";
+
 import ResidenteRegistro from "../pages/ResidenteRegistro";
+
 import ResidenteCrearPerfil from "../pages/ResidenteCrearPerfil";
+
 import { EditProfile } from "../pages/EditProfile";
+
 import { EditProfileSuccess } from "../pages/EditProfileSuccess";
 import { GuestRoute } from "./components/GuestRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -19,6 +29,7 @@ import CrearPerfilEmprendedor from "../pages/CrearPerfilEmprendedor";
 import EmprendResultCargueServ from "../pages/EmprendResultCargueServ";
 
 const router = createBrowserRouter([
+
   { path: "/", element: <HomePage /> },
   {
     path: "/login",
@@ -100,3 +111,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+
