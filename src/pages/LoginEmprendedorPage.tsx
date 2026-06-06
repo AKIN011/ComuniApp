@@ -10,7 +10,8 @@ import {
   Users,
 } from "lucide-react";
 import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
-import { EMPRENDEDOR_ROUTES } from "../lib/emprendedorRoutes";
+import { SiteFooterLinks } from "../app/components/layout/SiteFooterLinks";
+import { ROUTES } from "../routes/paths";
 
 function LoginFooter() {
   return (
@@ -24,19 +25,7 @@ function LoginFooter() {
             © 2024 ComuniApp. Cultivando el comercio comunitario.
           </p>
         </div>
-        <div className="flex flex-wrap gap-8">
-          {["Política de privacidad", "Centro de ayuda", "Contáctenos"].map(
-            (label) => (
-              <button
-                key={label}
-                type="button"
-                className="font-['Inter:Regular',sans-serif] text-[14px] leading-[20px] text-[#475569] transition-colors hover:text-[#2d5bff]"
-              >
-                {label}
-              </button>
-            ),
-          )}
-        </div>
+        <SiteFooterLinks />
       </div>
     </footer>
   );
@@ -85,7 +74,7 @@ export default function LoginEmprendedorPage() {
                 className="flex flex-col gap-5"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  navigate(EMPRENDEDOR_ROUTES.tablero);
+                  navigate(ROUTES.entrepreneur.tablero);
                 }}
               >
                 <div className="flex flex-col gap-2">
@@ -98,54 +87,42 @@ export default function LoginEmprendedorPage() {
                   <div className="relative">
                     <Mail
                       aria-hidden
-                      className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#747688]"
+                      className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#94a3b8]"
                     />
                     <input
                       id="emprendedor-email"
                       type="email"
-                      autoComplete="email"
-                      placeholder="name@company.com"
-                      className="h-[52px] w-full rounded-[32px] border-none bg-[#eff4ff] pl-12 pr-4 font-['Inter:Regular',sans-serif] text-[16px] text-[#0d1c2e] outline-none placeholder:text-[rgba(116,118,136,0.6)] focus:ring-2 focus:ring-[#2d5bff]/30"
+                      required
+                      placeholder="emprendedor@comuniapp.com"
+                      className="h-[52px] w-full rounded-[16px] border border-[#e2e8f0] bg-[#f8f9ff] pl-12 pr-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none focus:ring-2 focus:ring-[#2d5bff]/30"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <label
-                      className="font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold leading-[20px] text-[#0d1c2e]"
-                      htmlFor="emprendedor-password"
-                    >
-                      Contraseña
-                    </label>
-                    <button
-                      type="button"
-                      className="font-['Inter:Medium',sans-serif] text-[13px] font-medium leading-[20px] text-[#2d5bff] transition-colors hover:text-[#1a4de8]"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </button>
-                  </div>
+                  <label
+                    className="font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold leading-[20px] text-[#0d1c2e]"
+                    htmlFor="emprendedor-password"
+                  >
+                    Contraseña
+                  </label>
                   <div className="relative">
                     <Lock
                       aria-hidden
-                      className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#747688]"
+                      className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#94a3b8]"
                     />
                     <input
                       id="emprendedor-password"
                       type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
+                      required
                       placeholder="••••••••"
-                      className="h-[52px] w-full rounded-[32px] border-none bg-[#eff4ff] pl-12 pr-12 font-['Inter:Regular',sans-serif] text-[16px] text-[#0d1c2e] outline-none placeholder:text-[rgba(116,118,136,0.6)] focus:ring-2 focus:ring-[#2d5bff]/30"
+                      className="h-[52px] w-full rounded-[16px] border border-[#e2e8f0] bg-[#f8f9ff] pl-12 pr-12 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none focus:ring-2 focus:ring-[#2d5bff]/30"
                     />
                     <button
                       type="button"
-                      aria-label={
-                        showPassword
-                          ? "Ocultar contraseña"
-                          : "Mostrar contraseña"
-                      }
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#747688] transition-colors hover:text-[#434656]"
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#94a3b8] transition-colors hover:text-[#64748b]"
                     >
                       {showPassword ? (
                         <EyeOff className="size-5" />
@@ -156,30 +133,59 @@ export default function LoginEmprendedorPage() {
                   </div>
                 </div>
 
+                <Link
+                  to={ROUTES.forgotPassword}
+                  className="self-end font-['Inter:Medium',sans-serif] text-[13px] font-medium text-[#2d5bff] no-underline hover:text-[#1a4de8]"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+
                 <button
                   type="submit"
-                  className="relative mt-1 flex h-[52px] w-full cursor-pointer items-center justify-center rounded-[9999px] border-none bg-gradient-to-r from-[#0040df] to-[#2d5bff] font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[16px] font-bold leading-[24px] text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-all duration-200 hover:brightness-105 active:scale-[0.98]"
+                  className="h-[52px] w-full cursor-pointer rounded-[9999px] bg-[#2d5bff] font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold text-white transition-all hover:bg-[#1a4de8] active:scale-[0.98]"
                 >
                   Iniciar sesión
                 </button>
               </form>
 
-              <p className="text-center font-['Inter:Regular',sans-serif] text-[14px] leading-[22px] text-[#64748b]">
-                ¿No tienes una cuenta?{" "}
+              <div className="flex items-center gap-3 rounded-[16px] bg-[#eef4fc] px-4 py-3">
+                <Shield className="size-5 shrink-0 text-[#2d5bff]" />
+                <p className="font-['Inter:Regular',sans-serif] text-[13px] leading-[20px] text-[#475569]">
+                  Acceso seguro para emprendedores verificados de la comunidad.
+                </p>
+              </div>
+
+              <p className="text-center font-['Inter:Regular',sans-serif] text-[14px] text-[#64748b]">
+                ¿Eres residente?{" "}
                 <Link
-                  className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#2d5bff] transition-colors hover:text-[#1a4de8]"
-                  to="/registro"
+                  to={ROUTES.login}
+                  className="font-semibold text-[#2d5bff] no-underline hover:text-[#1a4de8]"
                 >
-                  Regístrate en su lugar
+                  Inicia sesión aquí
+                </Link>
+              </p>
+
+              <p className="text-center font-['Inter:Regular',sans-serif] text-[14px] text-[#64748b]">
+                ¿No tienes cuenta?{" "}
+                <Link
+                  to={ROUTES.registerEntrepreneur}
+                  className="font-semibold text-[#2d5bff] no-underline hover:text-[#1a4de8]"
+                >
+                  Regístrate
                 </Link>
               </p>
             </div>
           </div>
 
-          <div className="mt-10 flex items-center justify-center gap-8 text-[#0d1c2e] opacity-40">
-            <ShieldCheck className="size-7" strokeWidth={1.5} />
-            <Shield className="size-7" strokeWidth={1.5} />
-            <Users className="size-7" strokeWidth={1.5} />
+          <div className="mt-8 flex flex-wrap justify-center gap-6 text-[#64748b]">
+            <span className="inline-flex items-center gap-2 font-['Inter:Regular',sans-serif] text-[13px]">
+              <ShieldCheck className="size-4 text-[#22c55e]" />
+              Datos protegidos
+            </span>
+            <span className="inline-flex items-center gap-2 font-['Inter:Regular',sans-serif] text-[13px]">
+              <Users className="size-4 text-[#2d5bff]" />
+              Comunidad local
+            </span>
           </div>
         </main>
       </div>

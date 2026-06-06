@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { Link, useNavigate } from "react-router";
+import { ROUTES } from "../routes/paths";
 import {
   Check,
   LineChart,
@@ -139,6 +140,8 @@ function EditPencilButton({
 }
 
 function ProfileUpdateSuccessModal() {
+  const navigate = useNavigate();
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(248,249,255,0.35)] p-6 backdrop-blur-[14px]"
@@ -158,9 +161,10 @@ function ProfileUpdateSuccessModal() {
         </p>
         <button
           type="button"
+          onClick={() => navigate(ROUTES.entrepreneur.tablero)}
           className="mt-10 flex w-full items-center justify-center rounded-[9999px] bg-gradient-to-r from-[#0040df] to-[#2d5bff] py-4 font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-opacity hover:opacity-90"
         >
-          Ir al Home
+          Ir al tablero
         </button>
       </div>
     </div>
@@ -202,6 +206,7 @@ function toggleSection(current: EditSection, section: EditSection): EditSection 
 }
 
 export default function EmprendedorEditarPerfil() {
+  const navigate = useNavigate();
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [storeMenuOpen, setStoreMenuOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<EditSection>(null);
@@ -383,6 +388,7 @@ export default function EmprendedorEditarPerfil() {
               </button>
               <button
                 type="button"
+                onClick={() => navigate(ROUTES.entrepreneur.tablero)}
                 className="rounded-[9999px] bg-[#dce9ff] px-8 py-3 font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold text-[#0040df] transition-colors hover:bg-[#c5d9f5]"
               >
                 Vista previa del perfil
@@ -467,6 +473,17 @@ export default function EmprendedorEditarPerfil() {
             </ul>
             <button
               type="button"
+              onClick={() => {
+                const profileUrl = `${window.location.origin}${ROUTES.entrepreneur.editarPerfil}`;
+                if (navigator.share) {
+                  void navigator.share({
+                    title: "Mi perfil en ComuniApp",
+                    url: profileUrl,
+                  });
+                } else {
+                  void navigator.clipboard.writeText(profileUrl);
+                }
+              }}
               className="mt-auto flex items-center justify-center gap-2 rounded-[9999px] bg-white/20 py-3 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold backdrop-blur-sm transition-colors hover:bg-white/30"
             >
               <Share2 className="size-4" />

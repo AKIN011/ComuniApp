@@ -1,7 +1,23 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import React, { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router";
+import { ROUTES } from "../routes/paths";
 import svgPaths from "../imports/ResidenteRegistro1-1/svg-e44tleatyp";
 import { ProfileConfirmationModal } from "../app/components/ProfileConfirmationModal";
+import { registerNewUser } from "../lib/auth/credentials";
+import { type LoginFieldErrors } from "../lib/auth/validation";
+
+interface RegisterFormProps {
+  email: string;
+  password: string;
+  showPassword: boolean;
+  fieldErrors: LoginFieldErrors;
+  submitError: string;
+  isSubmitting: boolean;
+  onEmailChange: (value: string) => void;
+  onPasswordChange: (value: string) => void;
+  onTogglePassword: () => void;
+  onSubmit: (e: FormEvent) => void;
+}
 
 function Container2() {
   return (
@@ -92,20 +108,39 @@ function Label() {
   );
 }
 
-function Container7() {
+function Container7({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px overflow-clip relative" data-name="Container">
-      <input type="email" placeholder="name@company.com" className="[word-break:break-word] bg-transparent outline-none flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[normal] not-italic relative shrink-0 text-[16px] text-[#0d1c2e] placeholder:text-[rgba(116,118,136,0.6)] w-full" />
+      <input
+        type="email"
+        autoComplete="email"
+        placeholder="name@company.com"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="[word-break:break-word] bg-transparent outline-none flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[normal] not-italic relative shrink-0 text-[16px] text-[#0d1c2e] placeholder:text-[rgba(116,118,136,0.6)] w-full"
+      />
     </div>
   );
 }
 
-function Input() {
+function Input({
+  email,
+  onEmailChange,
+}: {
+  email: string;
+  onEmailChange: (value: string) => void;
+}) {
   return (
     <div className="bg-[#eff4ff] relative rounded-[32px] shrink-0 w-full" data-name="Input">
       <div className="flex flex-row justify-center overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start justify-center pl-[48px] pr-[16px] py-[16px] relative size-full">
-          <Container7 />
+          <Container7 value={email} onChange={onEmailChange} />
         </div>
       </div>
     </div>
@@ -124,20 +159,42 @@ function Container8() {
   );
 }
 
-function Container6() {
+function Container6({
+  email,
+  onEmailChange,
+}: {
+  email: string;
+  onEmailChange: (value: string) => void;
+}) {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <Input />
+      <Input email={email} onEmailChange={onEmailChange} />
       <Container8 />
     </div>
   );
 }
 
-function EmailField() {
+function EmailField({
+  email,
+  onEmailChange,
+  error,
+}: {
+  email: string;
+  onEmailChange: (value: string) => void;
+  error?: string;
+}) {
   return (
     <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Email Field">
       <Label />
-      <Container6 />
+      <Container6 email={email} onEmailChange={onEmailChange} />
+      {error && (
+        <p
+          role="alert"
+          className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -164,20 +221,47 @@ function Container9() {
   );
 }
 
-function Container11() {
+function Container11({
+  value,
+  onChange,
+  showPassword,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  showPassword: boolean;
+}) {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px overflow-clip relative" data-name="Container">
-      <input type="password" placeholder="••••••••" className="[word-break:break-word] bg-transparent outline-none flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[normal] not-italic relative shrink-0 text-[16px] text-[#0d1c2e] placeholder:text-[rgba(116,118,136,0.6)] w-full" />
+      <input
+        type={showPassword ? "text" : "password"}
+        autoComplete="new-password"
+        placeholder="••••••••"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="[word-break:break-word] bg-transparent outline-none flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[normal] not-italic relative shrink-0 text-[16px] text-[#0d1c2e] placeholder:text-[rgba(116,118,136,0.6)] w-full"
+      />
     </div>
   );
 }
 
-function Input1() {
+function Input1({
+  password,
+  onPasswordChange,
+  showPassword,
+}: {
+  password: string;
+  onPasswordChange: (value: string) => void;
+  showPassword: boolean;
+}) {
   return (
     <div className="bg-[#eff4ff] relative rounded-[32px] shrink-0 w-full" data-name="Input">
       <div className="flex flex-row justify-center overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start justify-center px-[48px] py-[16px] relative size-full">
-          <Container11 />
+          <Container11
+            value={password}
+            onChange={onPasswordChange}
+            showPassword={showPassword}
+          />
         </div>
       </div>
     </div>
@@ -208,53 +292,126 @@ function Container13() {
   );
 }
 
-function Button() {
+function Button({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" className="absolute cursor-pointer bottom-[37.75%] content-stretch flex flex-col items-center justify-center right-[16px] top-[37.75%] border-none outline-none bg-transparent p-0" data-name="Button">
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Mostrar u ocultar contraseña"
+      className="absolute cursor-pointer bottom-[37.75%] content-stretch flex flex-col items-center justify-center right-[16px] top-[37.75%] border-none outline-none bg-transparent p-0"
+      data-name="Button"
+    >
       <Container13 />
     </button>
   );
 }
 
-function Container10() {
+function Container10({
+  password,
+  onPasswordChange,
+  showPassword,
+  onTogglePassword,
+}: {
+  password: string;
+  onPasswordChange: (value: string) => void;
+  showPassword: boolean;
+  onTogglePassword: () => void;
+}) {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <Input1 />
+      <Input1
+        password={password}
+        onPasswordChange={onPasswordChange}
+        showPassword={showPassword}
+      />
       <Container12 />
-      <Button />
+      <Button onClick={onTogglePassword} />
     </div>
   );
 }
 
-function PasswordField() {
+function PasswordField({
+  password,
+  onPasswordChange,
+  showPassword,
+  onTogglePassword,
+  error,
+}: {
+  password: string;
+  onPasswordChange: (value: string) => void;
+  showPassword: boolean;
+  onTogglePassword: () => void;
+  error?: string;
+}) {
   return (
     <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Password Field">
       <Container9 />
-      <Container10 />
+      <Container10
+        password={password}
+        onPasswordChange={onPasswordChange}
+        showPassword={showPassword}
+        onTogglePassword={onTogglePassword}
+      />
+      {error && (
+        <p
+          role="alert"
+          className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }
 
-function ButtonPrimaryLoginAction({ onRegister }: { onRegister: () => void }) {
+function ButtonPrimaryLoginAction({ isSubmitting }: { isSubmitting: boolean }) {
   return (
-    <button onClick={onRegister} type="button" className="bg-gradient-to-r cursor-pointer content-stretch flex from-[#0040df] items-center justify-center py-[16px] relative rounded-[9999px] shrink-0 to-[#2d5bff] w-full border-none outline-none" data-name="Button - Primary Login Action">
+    <button
+      type="submit"
+      disabled={isSubmitting}
+      className="bg-gradient-to-r cursor-pointer content-stretch flex from-[#0040df] items-center justify-center py-[16px] relative rounded-[9999px] shrink-0 to-[#2d5bff] w-full border-none outline-none disabled:cursor-not-allowed disabled:opacity-70"
+      data-name="Button - Primary Login Action"
+    >
       <div className="absolute bg-[rgba(255,255,255,0)] inset-0 rounded-[9999px] shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)]" data-name="Button - Primary Login Action:shadow" />
       <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[16px] text-center text-white whitespace-nowrap">
-        <p className="leading-[24px]">Regístrate</p>
+        <p className="leading-[24px]">{isSubmitting ? "Registrando..." : "Regístrate"}</p>
       </div>
     </button>
   );
 }
 
-function Form({ onRegister }: { onRegister: () => void }) {
+function Form({ formProps }: { formProps: RegisterFormProps }) {
   return (
-    <div className="relative shrink-0 w-full" data-name="Form">
+    <form
+      className="relative shrink-0 w-full"
+      data-name="Form"
+      onSubmit={formProps.onSubmit}
+      noValidate
+    >
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col gap-[24px] items-start relative size-full">
-        <EmailField />
-        <PasswordField />
-        <ButtonPrimaryLoginAction onRegister={onRegister} />
+        {formProps.submitError && (
+          <p
+            role="alert"
+            className="w-full rounded-[12px] bg-[#fef2f2] px-4 py-3 text-center font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#b91c1c]"
+          >
+            {formProps.submitError}
+          </p>
+        )}
+        <EmailField
+          email={formProps.email}
+          onEmailChange={formProps.onEmailChange}
+          error={formProps.fieldErrors.email}
+        />
+        <PasswordField
+          password={formProps.password}
+          onPasswordChange={formProps.onPasswordChange}
+          showPassword={formProps.showPassword}
+          onTogglePassword={formProps.onTogglePassword}
+          error={formProps.fieldErrors.password}
+        />
+        <ButtonPrimaryLoginAction isSubmitting={formProps.isSubmitting} />
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -290,9 +447,12 @@ function Paragraph() {
       <div className="flex flex-col font-['Inter:Medium',sans-serif] font-medium justify-center relative shrink-0 text-[#434656]">
         <p className="leading-[20px]">¿Ya tienes una cuenta?</p>
       </div>
-      <button className="flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center relative shrink-0 text-[#0040df] cursor-pointer bg-transparent border-none p-0 outline-none hover:underline">
+      <Link
+        to="/login"
+        className="flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center relative shrink-0 text-[#0040df] cursor-pointer bg-transparent border-none p-0 outline-none no-underline hover:underline"
+      >
         <p className="leading-[20px]">Inicia Sesión</p>
-      </button>
+      </Link>
     </div>
   );
 }
@@ -363,10 +523,10 @@ function SecondaryActions({ onEmprendedor }: { onEmprendedor: () => void }) {
 }
 
 function LoginCard({
-  onRegister,
+  formProps,
   onEmprendedor,
 }: {
-  onRegister: () => void;
+  formProps: RegisterFormProps;
   onEmprendedor: () => void;
 }) {
   return (
@@ -374,7 +534,7 @@ function LoginCard({
       <div aria-hidden className="absolute border border-[rgba(196,197,217,0.1)] border-solid inset-0 pointer-events-none rounded-[48px]" />
       <div className="content-stretch flex flex-col gap-[32px] items-start pb-[49px] pt-[41px] px-[24px] sm:px-[41px] relative size-full">
         <Container4 />
-        <Form onRegister={onRegister} />
+        <Form formProps={formProps} />
         <Divider />
         <SecondaryActions onEmprendedor={onEmprendedor} />
       </div>
@@ -430,26 +590,26 @@ function TrustBadges() {
 }
 
 function Container({
-  onRegister,
+  formProps,
   onEmprendedor,
 }: {
-  onRegister: () => void;
+  formProps: RegisterFormProps;
   onEmprendedor: () => void;
 }) {
   return (
     <div className="content-stretch flex flex-col gap-[40px] items-start w-full max-w-[448px] relative shrink-0" data-name="Container">
       <LogoAnchor />
-      <LoginCard onRegister={onRegister} onEmprendedor={onEmprendedor} />
+      <LoginCard formProps={formProps} onEmprendedor={onEmprendedor} />
       <TrustBadges />
     </div>
   );
 }
 
 function MainTopAppBarSuppressedForLoginJourneyAsPerSemanticShellMandate({
-  onRegister,
+  formProps,
   onEmprendedor,
 }: {
-  onRegister: () => void;
+  formProps: RegisterFormProps;
   onEmprendedor: () => void;
 }) {
   return (
@@ -457,7 +617,7 @@ function MainTopAppBarSuppressedForLoginJourneyAsPerSemanticShellMandate({
       <div className="flex flex-row items-center justify-center overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-center justify-center p-[24px] relative size-full">
            <div className="absolute bg-[#e6eeff] blur-[60px] bottom-1/2 left-[-5%] opacity-60 right-[65%] rounded-[9999px] top-[-10%]" data-name="Minimalist Background Decoration" />
-          <Container onRegister={onRegister} onEmprendedor={onEmprendedor} />
+          <Container formProps={formProps} onEmprendedor={onEmprendedor} />
         </div>
       </div>
     </div>
@@ -479,31 +639,31 @@ function Paragraph1() {
 
 function Link1() {
   return (
-    <a href="#" className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
+    <Link to={ROUTES.privacy} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
       <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
         <p className="leading-[20px]">Política de privacidad</p>
       </div>
-    </a>
+    </Link>
   );
 }
 
 function Link3() {
   return (
-    <a href="#" className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
+    <Link to={ROUTES.help} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
       <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
         <p className="leading-[20px]">Centro de ayuda</p>
       </div>
-    </a>
+    </Link>
   );
 }
 
 function Link4() {
   return (
-    <a href="#" className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
+    <Link to={ROUTES.contact} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
       <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
         <p className="leading-[20px]">Contáctenos</p>
       </div>
-    </a>
+    </Link>
   );
 }
 
@@ -541,9 +701,53 @@ function FooterComponentExecutionMargin() {
 export default function ResidenteRegistro() {
   const navigate = useNavigate();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({});
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = (e: FormEvent) => {
+    e.preventDefault();
+    setSubmitError("");
+
+    setIsSubmitting(true);
+
+    const result = registerNewUser(email, password, "resident");
+
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      if (result.fieldErrors) setFieldErrors(result.fieldErrors);
+      setSubmitError(result.error ?? "No se pudo registrar.");
+      return;
+    }
+
     setShowWelcomeModal(true);
+  };
+
+  const formProps: RegisterFormProps = {
+    email,
+    password,
+    showPassword,
+    fieldErrors,
+    submitError,
+    isSubmitting,
+    onEmailChange: (value) => {
+      setEmail(value);
+      if (fieldErrors.email) {
+        setFieldErrors((prev) => ({ ...prev, email: undefined }));
+      }
+    },
+    onPasswordChange: (value) => {
+      setPassword(value);
+      if (fieldErrors.password) {
+        setFieldErrors((prev) => ({ ...prev, password: undefined }));
+      }
+    },
+    onTogglePassword: () => setShowPassword((prev) => !prev),
+    onSubmit: handleRegister,
   };
 
   const continueToProfile = () => {
@@ -558,7 +762,7 @@ export default function ResidenteRegistro() {
   return (
     <div className="content-stretch flex flex-col min-h-screen isolate items-start relative size-full" style={{ backgroundImage: "linear-gradient(90deg, rgb(248, 249, 255) 0%, rgb(248, 249, 255) 100%), linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%)" }} data-name="RESIDENTE REGISTRO 1">
       <MainTopAppBarSuppressedForLoginJourneyAsPerSemanticShellMandate
-        onRegister={handleRegister}
+        formProps={formProps}
         onEmprendedor={goToEmprendedorRegistro}
       />
       <FooterComponentExecutionMargin />
