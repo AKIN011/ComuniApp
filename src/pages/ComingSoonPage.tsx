@@ -4,6 +4,30 @@ import { ROUTES } from "../routes/paths";
 export default function ComingSoonPage() {
   const [params] = useSearchParams();
   const category = params.get("categoria") ?? "esta categoría";
+  const isConfiguracion = category === "Configuración";
+
+  if (isConfiguracion) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f8f9ff] px-8 py-16">
+        <div className="mx-auto max-w-[560px] rounded-[24px] bg-white p-10 text-center shadow-[0px_8px_30px_0px_rgba(13,28,46,0.06)]">
+          <h1 className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[28px] font-extrabold text-[#0d1c2e]">
+            Próximamente
+          </h1>
+          <p className="mt-4 font-['Inter:Regular',sans-serif] text-[16px] leading-[26px] text-[#64748b]">
+            La opción de <strong>{category}</strong> estará disponible pronto.
+          </p>
+          <div className="mt-8 flex justify-center">
+            <Link
+              to={ROUTES.entrepreneur.tablero}
+              className="rounded-[9999px] bg-[#2d5bff] px-6 py-3 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold text-white no-underline hover:bg-[#1a4de8]"
+            >
+              Ir al dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] px-8 py-16">

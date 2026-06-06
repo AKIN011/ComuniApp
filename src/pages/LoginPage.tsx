@@ -140,7 +140,7 @@ export default function LoginPage() {
 
 
 
-    const result = login(email, password);
+    const result = login(email, password, "resident");
 
 
 

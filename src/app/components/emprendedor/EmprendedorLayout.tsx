@@ -6,6 +6,8 @@ import {
   Settings,
   UserRound,
 } from "lucide-react";
+import { ComuniAppLogo } from "../ComuniAppLogo";
+import { EmprendedorStoreMenu } from "./EmprendedorStoreMenu";
 import { SiteFooterLinks } from "../layout/SiteFooterLinks";
 import { ROUTES } from "../../../routes/paths";
 
@@ -29,15 +31,6 @@ const mainNav = [
     end: true,
   },
 ] as const;
-
-function EmprendedorLogo() {
-  return (
-    <span className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[22px] font-extrabold leading-[28px] tracking-[-0.5px]">
-      <span className="text-[#2d5bff]">Comuni</span>
-      <span className="text-[#22c55e]">App</span>
-    </span>
-  );
-}
 
 function SidebarNavItem({
   to,
@@ -106,7 +99,11 @@ export function EmprendedorLayout() {
           </button>
           <button
             type="button"
-            onClick={() => navigate(ROUTES.help)}
+            onClick={() =>
+              navigate(ROUTES.help, {
+                state: { returnTo: ROUTES.entrepreneur.tablero },
+              })
+            }
             className="flex items-center gap-3 rounded-[16px] px-4 py-3 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#64748b] transition-colors hover:bg-white/60"
           >
             <CircleHelp className="size-4 shrink-0" />
@@ -117,19 +114,8 @@ export function EmprendedorLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-[#e8eeff] bg-white px-8 py-4">
-          <EmprendedorLogo />
-          <button
-            type="button"
-            aria-label="Ir a editar perfil"
-            onClick={() => navigate(ROUTES.entrepreneur.editarPerfil)}
-            className="size-10 overflow-hidden rounded-full border-2 border-[#e2e8f0] bg-[#cbd5e1]"
-          >
-            <img
-              alt="Perfil emprendedor"
-              className="size-full object-cover"
-              src="https://images.unsplash.com/photo-1568605114967-8130f3a36993?w=80&q=80"
-            />
-          </button>
+          <ComuniAppLogo to={ROUTES.entrepreneur.tablero} height={28} />
+          <EmprendedorStoreMenu />
         </header>
 
         <div className="flex flex-1 flex-col px-8 py-8">

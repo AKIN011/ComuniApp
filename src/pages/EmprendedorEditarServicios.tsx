@@ -6,8 +6,13 @@ import {
   type DragEvent,
   type RefObject,
 } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { ROUTES } from "../routes/paths";
+import type { EditServiceNavigationState } from "../app/components/emprendedor/emprendedorData";
+import {
+  fileToDataUrl,
+  saveServiceEdit,
+} from "../app/utils/emprendedorServicioStorage";
 import {
   ArrowLeft,
   Camera,
@@ -20,6 +25,11 @@ import {
 
 const MAX_IMAGES = 10;
 const MAX_FILE_SIZE_MB = 10;
+
+type ServiceImage = {
+  file?: File;
+  url: string;
+};
 
 function useClickOutside(
   ref: RefObject<HTMLElement | null>,
@@ -203,16 +213,36 @@ function PageFooter() {
 
 export default function EmprendedorEditarServicios() {
   const navigate = useNavigate();
+  const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editState = location.state as EditServiceNavigationState | null;
 
   const [storeMenuOpen, setStoreMenuOpen] = useState(false);
+  const [serviceId, setServiceId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [active, setActive] = useState(true);
-  const [images, setImages] = useState<{ file: File; url: string }[]>([]);
+  const [images, setImages] = useState<ServiceImage[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!editState?.serviceId) {
+      navigate(ROUTES.entrepreneur.servicios, { replace: true });
+      return;
+    }
+
+    setServiceId(editState.serviceId);
+    setTitle(editState.title);
+    setDescription(editState.description);
+    setActive(editState.status === "activo" || editState.status === "en_revision");
+
+    if (editState.image) {
+      setImages([{ url: editState.image }]);
+    }
+  }, [editState, navigate]);
 
   const addFiles = useCallback((files: FileList | File[]) => {
     const list = Array.from(files).filter(
@@ -233,7 +263,9 @@ export default function EmprendedorEditarServicios() {
   }, []);
 
   useEffect(() => {
-    const urls = images.map((img) => img.url);
+    const urls = images
+      .map((img) => img.url)
+      .filter((url) => url.startsWith("blob:"));
     return () => {
       urls.forEach((url) => URL.revokeObjectURL(url));
     };
@@ -245,13 +277,42 @@ export default function EmprendedorEditarServicios() {
     if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
   };
 
-  const handleUpdate = () => {
+  if (!editState?.serviceId) {
+    return null;
+  }
+
+  const handleUpdate = async () => {
     if (!title.trim()) {
       setStatusMessage("Ingresa un título para el servicio.");
       return;
     }
+
     setStatusMessage(null);
-    setShowUpdateModal(true);
+    setIsSaving(true);
+
+    try {
+      const primaryImage = images[0];
+      let imageUrl = primaryImage?.url ?? editState.image;
+
+      if (primaryImage?.file) {
+        imageUrl = await fileToDataUrl(primaryImage.file);
+      }
+
+      await saveServiceEdit({
+        serviceId,
+        title: title.trim(),
+        description: description.trim(),
+        image: imageUrl,
+        active,
+        originalStatus: editState.status,
+      });
+
+      setShowUpdateModal(true);
+    } catch {
+      setStatusMessage("No se pudo actualizar el servicio. Inténtalo de nuevo.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -456,9 +517,10 @@ export default function EmprendedorEditarServicios() {
               <button
                 type="button"
                 onClick={handleUpdate}
-                className="w-full rounded-[9999px] bg-[#2d5bff] py-4 font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(45,91,255,0.35)] transition-opacity hover:opacity-90"
+                disabled={isSaving}
+                className="w-full rounded-[9999px] bg-[#2d5bff] py-4 font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(45,91,255,0.35)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Actualizar
+                {isSaving ? "Actualizando..." : "Actualizar"}
               </button>
             </aside>
           </div>

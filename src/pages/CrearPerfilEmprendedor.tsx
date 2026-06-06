@@ -4,6 +4,11 @@ import { Check, Megaphone, Store } from "lucide-react";
 import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
 import { SiteFooterLinks } from "../app/components/layout/SiteFooterLinks";
 import { ROUTES } from "../routes/paths";
+import { useAuth } from "../context/AuthContext";
+import {
+  validateProfileForm,
+  type ProfileFieldErrors,
+} from "../lib/auth/profile";
 
 function PageFooter() {
   return (
@@ -80,6 +85,7 @@ function ProfileCard({
   onCelularChange,
   onContinue,
   showContinue,
+  fieldErrors,
 }: {
   nombres: string;
   apellidos: string;
@@ -89,6 +95,7 @@ function ProfileCard({
   onCelularChange: (v: string) => void;
   onContinue: () => void;
   showContinue: boolean;
+  fieldErrors?: ProfileFieldErrors;
 }) {
   return (
     <div className="w-full max-w-[449px] shrink-0 rounded-[48px] bg-white px-6 pb-12 pt-10 shadow-[0px_20px_20px_rgba(13,28,46,0.06)] sm:px-10">
@@ -123,6 +130,11 @@ function ProfileCard({
               onChange={(e) => onNombresChange(e.target.value)}
               className={inputClass}
             />
+            {fieldErrors?.firstName && (
+              <p className="font-['Inter:Regular',sans-serif] text-[13px] text-[#dc2626]">
+                {fieldErrors.firstName}
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-2">
             <label className={labelClass} htmlFor="apellidos">
@@ -136,6 +148,11 @@ function ProfileCard({
               onChange={(e) => onApellidosChange(e.target.value)}
               className={inputClass}
             />
+            {fieldErrors?.lastName && (
+              <p className="font-['Inter:Regular',sans-serif] text-[13px] text-[#dc2626]">
+                {fieldErrors.lastName}
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-2">
             <label className={labelClass} htmlFor="celular">
@@ -149,6 +166,11 @@ function ProfileCard({
               onChange={(e) => onCelularChange(e.target.value)}
               className={inputClass}
             />
+            {fieldErrors?.phone && (
+              <p className="font-['Inter:Regular',sans-serif] text-[13px] text-[#dc2626]">
+                {fieldErrors.phone}
+              </p>
+            )}
           </div>
           {showContinue && (
             <button type="submit" className={continueBtnClass}>
@@ -210,16 +232,61 @@ function BusinessCard({
 }
 
 export default function CrearPerfilEmprendedor() {
+  const { updateProfile } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
   const [nombres, setNombres] = useState("");
   const [apellidos, setApellidos] = useState("");
   const [celular, setCelular] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [profileErrors, setProfileErrors] = useState<ProfileFieldErrors>({});
+  const [submitError, setSubmitError] = useState("");
 
-  const handleStep1Continue = () => setStep(2);
+  const handleStep1Continue = () => {
+    setSubmitError("");
+    const validation = validateProfileForm({
+      firstName: nombres,
+      lastName: apellidos,
+      phone: celular,
+    });
+    setProfileErrors(validation.errors);
 
-  const handleStep2Continue = () => setShowSuccessModal(true);
+    if (!validation.isValid) return;
+
+    setStep(2);
+  };
+
+  const handleStep2Continue = () => {
+    setSubmitError("");
+
+    if (!descripcion.trim()) {
+      setSubmitError("La descripción del negocio es obligatoria.");
+      return;
+    }
+
+    const validation = validateProfileForm({
+      firstName: nombres,
+      lastName: apellidos,
+      phone: celular,
+    });
+    setProfileErrors(validation.errors);
+
+    if (!validation.isValid) return;
+
+    const result = updateProfile({
+      firstName: nombres.trim(),
+      lastName: apellidos.trim(),
+      phone: celular.trim(),
+    });
+
+    if (!result.success) {
+      if (result.fieldErrors) setProfileErrors(result.fieldErrors);
+      setSubmitError(result.error ?? "No se pudo guardar el perfil.");
+      return;
+    }
+
+    setShowSuccessModal(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f9ff]">
@@ -234,6 +301,14 @@ export default function CrearPerfilEmprendedor() {
         </header>
 
         <main className="relative z-[2] w-full max-w-[960px]">
+          {submitError && (
+            <p
+              role="alert"
+              className="mx-auto mb-6 max-w-[449px] rounded-[12px] bg-[#fef2f2] px-4 py-3 text-center font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#b91c1c]"
+            >
+              {submitError}
+            </p>
+          )}
           <div
             className={`flex items-start justify-center gap-6 transition-all duration-500 ease-in-out ${
               step === 1 ? "flex-col" : "flex-col md:flex-row md:justify-center"
@@ -255,6 +330,7 @@ export default function CrearPerfilEmprendedor() {
                 onCelularChange={setCelular}
                 onContinue={handleStep1Continue}
                 showContinue={step === 1}
+                fieldErrors={profileErrors}
               />
             </div>
 

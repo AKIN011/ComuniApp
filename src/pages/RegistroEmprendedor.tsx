@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { registerNewUser } from "../lib/auth/credentials";
+import { useAuth } from "../context/AuthContext";
 import {
   validateLoginForm,
   type LoginFieldErrors,
@@ -13,9 +14,11 @@ import {
   Shield,
   ShieldCheck,
   Users,
+  Home,
 } from "lucide-react";
 import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
 import { ProfileConfirmationModal } from "../app/components/ProfileConfirmationModal";
+import { ROUTES } from "../routes/paths";
 
 function RegistroFooter() {
   return (
@@ -54,6 +57,7 @@ const inputErrorClass = "ring-2 ring-[#dc2626]/40";
 
 export default function RegistroEmprendedor() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [email, setEmail] = useState("");
@@ -83,12 +87,22 @@ export default function RegistroEmprendedor() {
       return;
     }
 
+    const loginResult = login(email, password, "entrepreneur");
+
+    if (!loginResult.success) {
+      setSubmitError(
+        loginResult.error ??
+          "Registro completado, pero no se pudo iniciar sesión. Inicia sesión manualmente.",
+      );
+      return;
+    }
+
     setShowWelcomeModal(true);
   };
 
   const continueToProfile = () => {
     setShowWelcomeModal(false);
-    navigate("/registro/emprendedor/crear-perfil");
+    navigate(ROUTES.registerEntrepreneurCreateProfile);
   };
 
   return (
@@ -246,12 +260,25 @@ export default function RegistroEmprendedor() {
             <p className="mt-4 text-center font-['Inter:Regular',sans-serif] text-[14px] leading-[22px] text-[#64748b]">
               ¿Ya tienes una cuenta?{" "}
               <Link
-                to="/login"
+                to={ROUTES.loginEntrepreneur}
                 className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#2d5bff] no-underline transition-colors hover:text-[#1a4de8]"
               >
                 Inicia sesión
               </Link>
             </p>
+
+            <div className="mt-8 border-t border-[#e2e8f0] pt-8">
+              <p className="text-center font-['Inter:Medium',sans-serif] text-[11px] font-medium uppercase leading-[16px] tracking-[0.08em] text-[#94a3b8]">
+                ¿Estas buscando servicios?
+              </p>
+              <Link
+                to={ROUTES.login}
+                className="mt-4 flex h-[48px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[#fce8d5] font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold leading-[22px] text-[#9a6b45] no-underline transition-all duration-200 hover:bg-[#f9dcc0] active:scale-[0.98]"
+              >
+                <Home className="size-5" strokeWidth={2} />
+                Inicia como residente
+              </Link>
+            </div>
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-10 text-[#cbd5e1]">

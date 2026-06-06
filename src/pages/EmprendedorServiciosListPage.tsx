@@ -1,10 +1,12 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router";
 import type { EmprendedorService } from "../app/components/emprendedor/emprendedorData";
 import {
   activeServices as initialActiveServices,
-  EMPRENDEDOR_USER_NAME,
+  getEntrepreneurFirstName,
   inactiveServices as initialInactiveServices,
 } from "../app/components/emprendedor/emprendedorData";
+import { useAuth } from "../context/AuthContext";
 import {
   EmprendedorServiceAlertOverlay,
   type ServiceAlertVariant,
@@ -14,47 +16,79 @@ import {
   ListActiveServiceCard,
   ListInactiveServiceCard,
 } from "../app/components/emprendedor/ServiceCards";
+import {
+  buildEmprendedorServiceLists,
+  clearPublishedService,
+  isPublishedServiceId,
+  removeServiceOverride,
+  saveServiceOverride,
+  updatePublishedServiceActive,
+} from "../app/utils/emprendedorServicioStorage";
 
 export default function EmprendedorServiciosListPage() {
-  const [activeList, setActiveList] =
-    useState<EmprendedorService[]>(initialActiveServices);
-  const [inactiveList, setInactiveList] = useState<EmprendedorService[]>(
-    initialInactiveServices,
-  );
+  const { user } = useAuth();
+  const location = useLocation();
+  const [refreshToken, setRefreshToken] = useState(0);
   const [alertVariant, setAlertVariant] = useState<ServiceAlertVariant | null>(
     null,
   );
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  const { activeServices: activeList, inactiveServices: inactiveList } =
+    useMemo(
+      () =>
+        buildEmprendedorServiceLists(
+          initialActiveServices,
+          initialInactiveServices,
+        ),
+      [refreshToken],
+    );
+
+  const refreshLists = useCallback(() => {
+    setRefreshToken((token) => token + 1);
+  }, []);
+
+  useEffect(() => {
+    refreshLists();
+  }, [location.key, refreshLists]);
 
   const closeAlert = useCallback(() => {
     setAlertVariant(null);
     setPendingDeleteId(null);
   }, []);
 
-  const handleDeactivate = useCallback((serviceId: string) => {
-    setActiveList((prev) => {
-      const service = prev.find((s) => s.id === serviceId);
-      if (!service) return prev;
-      setInactiveList((inactive) => [
-        { ...service, status: "inactivo" },
-        ...inactive,
-      ]);
-      return prev.filter((s) => s.id !== serviceId);
-    });
-    setAlertVariant("deactivate-success");
-  }, []);
+  const handleDeactivate = useCallback(
+    (serviceId: string) => {
+      const service = activeList.find((item) => item.id === serviceId);
+      if (!service) return;
 
-  const handleActivate = useCallback((serviceId: string) => {
-    setInactiveList((prev) => {
-      const service = prev.find((s) => s.id === serviceId);
-      if (!service) return prev;
-      setActiveList((active) => [
-        { ...service, status: "activo" },
-        ...active,
-      ]);
-      return prev.filter((s) => s.id !== serviceId);
-    });
-  }, []);
+      saveServiceOverride(serviceId, { status: "inactivo" });
+
+      if (isPublishedServiceId(serviceId)) {
+        updatePublishedServiceActive(false);
+      }
+
+      refreshLists();
+      setAlertVariant("deactivate-success");
+    },
+    [activeList, refreshLists],
+  );
+
+  const handleActivate = useCallback(
+    (serviceId: string) => {
+      const service = inactiveList.find((item) => item.id === serviceId);
+      if (!service) return;
+
+      saveServiceOverride(serviceId, { status: "activo" });
+
+      if (isPublishedServiceId(serviceId)) {
+        updatePublishedServiceActive(true);
+      }
+
+      refreshLists();
+    },
+    [inactiveList, refreshLists],
+  );
 
   const handleDeleteRequest = useCallback((serviceId: string) => {
     setPendingDeleteId(serviceId);
@@ -63,16 +97,24 @@ export default function EmprendedorServiciosListPage() {
 
   const handleConfirmDelete = useCallback(() => {
     if (!pendingDeleteId) return;
-    setInactiveList((prev) => prev.filter((s) => s.id !== pendingDeleteId));
+
+    saveServiceOverride(pendingDeleteId, { deleted: true });
+
+    if (isPublishedServiceId(pendingDeleteId)) {
+      clearPublishedService();
+      removeServiceOverride(pendingDeleteId);
+    }
+
+    refreshLists();
     setPendingDeleteId(null);
     setAlertVariant("delete-success");
-  }, [pendingDeleteId]);
+  }, [pendingDeleteId, refreshLists]);
 
   return (
     <div data-name="EMPRENDEDOR LISTA DE SERVICIOS">
       <header className="mb-10">
         <h1 className="font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[36px] font-bold leading-[44px] tracking-[-0.8px] text-[#0d1c2e]">
-          Hola, {EMPRENDEDOR_USER_NAME}
+          Hola, {getEntrepreneurFirstName(user)}
         </h1>
         <p className="mt-2 font-['Inter:Regular',sans-serif] text-[16px] leading-[26px] text-[#64748b]">
           Estos son los servicios que actualmente tienes cargados en la
@@ -92,7 +134,7 @@ export default function EmprendedorServiciosListPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {activeList.map((service) => (
+          {activeList.map((service: EmprendedorService) => (
             <ListActiveServiceCard
               key={service.id}
               service={service}
@@ -114,7 +156,7 @@ export default function EmprendedorServiciosListPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {inactiveList.map((service) => (
+          {inactiveList.map((service: EmprendedorService) => (
             <ListInactiveServiceCard
               key={service.id}
               service={service}

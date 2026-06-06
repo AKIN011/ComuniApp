@@ -1,6 +1,7 @@
 import { BadgeCheck, MapPin, Phone } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { formatPrice } from "../../../lib/catalog/formatters";
+import { buildWhatsAppContactUrl } from "../../../lib/whatsapp";
 import type { Service } from "../../../data/types";
 
 interface ProviderCardProps {
@@ -57,7 +58,9 @@ export function ProviderCard({ service }: ProviderCardProps) {
       </div>
 
       <a
-        href={`tel:${provider.phone.replace(/\s/g, "")}`}
+        href={buildWhatsAppContactUrl(provider.phone)}
+        target="_blank"
+        rel="noopener noreferrer"
         className="mt-4 flex h-[52px] w-full items-center justify-center rounded-[9999px] bg-[#2d5bff] font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold text-white no-underline transition-all duration-200 hover:bg-[#1a4de8] active:scale-[0.98]"
       >
         ¡Contactar!

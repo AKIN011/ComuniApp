@@ -1,3 +1,5 @@
+import type { SessionUser } from "../../../lib/auth/types";
+
 export type ServiceStatus = "activo" | "en_revision" | "inactivo";
 
 export type EmprendedorService = {
@@ -12,7 +14,37 @@ export type EmprendedorService = {
   ingresos?: string;
 };
 
-export const EMPRENDEDOR_USER_NAME = "Juan";
+export type EditServiceNavigationState = {
+  serviceId: string;
+  title: string;
+  description: string;
+  image: string;
+  status: EmprendedorService["status"];
+  price?: string;
+};
+
+export function toEditServiceNavigationState(
+  service: EmprendedorService,
+): EditServiceNavigationState {
+  return {
+    serviceId: service.id,
+    title: service.title,
+    description: service.description,
+    image: service.image,
+    status: service.status,
+    price: service.price,
+  };
+}
+
+export function getEntrepreneurFirstName(user: SessionUser | null): string {
+  if (!user) return "Emprendedor";
+
+  const firstName = user.firstName?.trim();
+  if (firstName) return firstName;
+
+  const namePart = user.name.trim().split(/\s+/)[0];
+  return namePart || "Emprendedor";
+}
 
 const reparacionPlacasService: EmprendedorService = {
   id: "reparacion-placas",
