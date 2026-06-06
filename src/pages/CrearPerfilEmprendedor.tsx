@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from "react";
+import { useNavigate } from "react-router";
 import { Check, Megaphone, Store } from "lucide-react";
 import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
+import { SiteFooterLinks } from "../app/components/layout/SiteFooterLinks";
+import { ROUTES } from "../routes/paths";
 
 function PageFooter() {
-  const links = ["Política de privacidad", "Centro de ayuda", "Contáctenos"];
-
   return (
     <footer className="mt-auto w-full bg-[#eff4ff] px-8 py-12">
       <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-6">
@@ -16,23 +17,14 @@ function PageFooter() {
             © 2024 ComuniApp. Cultivando el comercio comunitario.
           </p>
         </div>
-        <div className="flex flex-wrap gap-8">
-          {links.map((label) => (
-            <button
-              key={label}
-              type="button"
-              className="font-['Inter:Regular',sans-serif] text-[14px] leading-[20px] text-[#475569] transition-colors hover:text-[#2d5bff]"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <SiteFooterLinks />
       </div>
     </footer>
   );
 }
 
 function ProfileCreatedModal() {
+  const navigate = useNavigate();
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(248,249,255,0.35)] p-6 backdrop-blur-[14px]"
@@ -52,6 +44,7 @@ function ProfileCreatedModal() {
         </p>
         <button
           type="button"
+          onClick={() => navigate(ROUTES.entrepreneur.tablero)}
           className="mt-10 flex w-full items-center justify-center rounded-[9999px] bg-gradient-to-r from-[#0040df] to-[#2d5bff] py-4 font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-opacity hover:opacity-90"
         >
           Ir a dashboard

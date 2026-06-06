@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   ChevronRight,
   Pencil,
@@ -9,7 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
-import { EMPRENDEDOR_ROUTES } from "../../../lib/emprendedorRoutes";
+import { ROUTES } from "../../../routes/paths";
 import type { EmprendedorService } from "./emprendedorData";
 
 const statusBadge: Record<
@@ -44,7 +44,7 @@ function ServiceBadge({ status }: { status: EmprendedorService["status"] }) {
 export function GrowBusinessCard({ className = "" }: { className?: string }) {
   return (
     <Link
-      to={EMPRENDEDOR_ROUTES.crearServicio}
+      to={ROUTES.entrepreneur.crearServicio}
       className={`group flex min-h-[380px] flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-[#c7d7fe] bg-[#f0f4ff] p-8 text-center transition-colors hover:border-[#2d5bff]/40 hover:bg-[#e8eeff] ${className}`}
       aria-label="Crear nuevo servicio"
     >
@@ -124,6 +124,7 @@ export function ListActiveServiceCard({
   service: EmprendedorService;
   onDeactivate?: (serviceId: string) => void;
 }) {
+  const navigate = useNavigate();
   const showDeactivate = service.status === "activo" || service.status === "en_revision";
 
   return (
@@ -152,6 +153,11 @@ export function ListActiveServiceCard({
           <button
             type="button"
             aria-label="Editar servicio"
+            onClick={() =>
+              navigate(ROUTES.entrepreneur.crearServicio, {
+                state: { serviceId: service.id },
+              })
+            }
             className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-[#e2e8f0] bg-white text-[#64748b] transition-colors hover:border-[#2d5bff]/30 hover:text-[#2d5bff]"
           >
             <Pencil className="size-4" />

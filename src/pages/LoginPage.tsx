@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 
 import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
+import { SiteFooterLinks } from "../app/components/layout/SiteFooterLinks";
+import { ROUTES } from "../routes/paths";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -62,27 +64,7 @@ function LoginFooter() {
 
         <div className="flex flex-wrap gap-8">
 
-          {["Política de privacidad", "Centro de ayuda", "Contáctenos"].map(
-
-            (label) => (
-
-              <button
-
-                key={label}
-
-                type="button"
-
-                className="font-['Inter:Regular',sans-serif] text-[14px] leading-[20px] text-[#475569] transition-colors hover:text-[#2d5bff]"
-
-              >
-
-                {label}
-
-              </button>
-
-            ),
-
-          )}
+          <SiteFooterLinks />
 
         </div>
 
@@ -336,17 +318,17 @@ export default function LoginPage() {
 
                   </label>
 
-                  <button
+                  <Link
 
-                    type="button"
+                    to={ROUTES.forgotPassword}
 
-                    className="font-['Inter:Medium',sans-serif] text-[13px] font-medium leading-[20px] text-[#2d5bff] transition-colors hover:text-[#1a4de8]"
+                    className="font-['Inter:Medium',sans-serif] text-[13px] font-medium leading-[20px] text-[#2d5bff] no-underline transition-colors hover:text-[#1a4de8]"
 
                   >
 
                     ¿Olvidaste tu contraseña?
 
-                  </button>
+                  </Link>
 
                 </div>
 

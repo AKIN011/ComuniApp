@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router";
+import { NavLink, Outlet, useNavigate } from "react-router";
 import {
   CircleHelp,
   LayoutGrid,
@@ -6,23 +6,24 @@ import {
   Settings,
   UserRound,
 } from "lucide-react";
-import { EMPRENDEDOR_ROUTES } from "../../../lib/emprendedorRoutes";
+import { SiteFooterLinks } from "../layout/SiteFooterLinks";
+import { ROUTES } from "../../../routes/paths";
 
 const mainNav = [
   {
-    to: EMPRENDEDOR_ROUTES.tablero,
+    to: ROUTES.entrepreneur.tablero,
     label: "Tablero",
     icon: LayoutGrid,
     end: true,
   },
   {
-    to: EMPRENDEDOR_ROUTES.servicios,
+    to: ROUTES.entrepreneur.servicios,
     label: "Listado de servicios",
     icon: List,
     end: true,
   },
   {
-    to: EMPRENDEDOR_ROUTES.editarPerfil,
+    to: ROUTES.entrepreneur.editarPerfil,
     label: "Editar mi perfil",
     icon: UserRound,
     end: true,
@@ -73,26 +74,18 @@ function EmprendedorFooter() {
       <p className="font-['Inter:Regular',sans-serif] text-[13px] text-[#94a3b8]">
         ©ComuniApp 2026
       </p>
-      <div className="flex flex-wrap gap-6">
-        {[
-          "Política de privacidad",
-          "Terminos de servicio",
-          "Informe de Sostenibilidad",
-        ].map((label) => (
-          <button
-            key={label}
-            type="button"
-            className="font-['Inter:Regular',sans-serif] text-[13px] text-[#94a3b8] transition-colors hover:text-[#2d5bff]"
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <SiteFooterLinks
+        variant="entrepreneur"
+        className="gap-6"
+        linkClassName="font-['Inter:Regular',sans-serif] text-[13px] text-[#94a3b8] no-underline transition-colors hover:text-[#2d5bff]"
+      />
     </footer>
   );
 }
 
 export function EmprendedorLayout() {
+  const navigate = useNavigate();
+
   return (
     <div className="flex min-h-screen bg-[#f8f9ff]">
       <aside className="flex w-[260px] shrink-0 flex-col bg-[#eef4fc] px-4 py-8">
@@ -105,6 +98,7 @@ export function EmprendedorLayout() {
         <div className="mt-auto flex flex-col gap-1 pt-8">
           <button
             type="button"
+            onClick={() => navigate(ROUTES.comingSoon("Configuración"))}
             className="flex items-center gap-3 rounded-[16px] px-4 py-3 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#64748b] transition-colors hover:bg-white/60"
           >
             <Settings className="size-4 shrink-0" />
@@ -112,6 +106,7 @@ export function EmprendedorLayout() {
           </button>
           <button
             type="button"
+            onClick={() => navigate(ROUTES.help)}
             className="flex items-center gap-3 rounded-[16px] px-4 py-3 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#64748b] transition-colors hover:bg-white/60"
           >
             <CircleHelp className="size-4 shrink-0" />
@@ -125,11 +120,12 @@ export function EmprendedorLayout() {
           <EmprendedorLogo />
           <button
             type="button"
-            aria-label="Perfil"
+            aria-label="Ir a editar perfil"
+            onClick={() => navigate(ROUTES.entrepreneur.editarPerfil)}
             className="size-10 overflow-hidden rounded-full border-2 border-[#e2e8f0] bg-[#cbd5e1]"
           >
             <img
-              alt=""
+              alt="Perfil emprendedor"
               className="size-full object-cover"
               src="https://images.unsplash.com/photo-1568605114967-8130f3a36993?w=80&q=80"
             />

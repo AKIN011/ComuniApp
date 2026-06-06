@@ -7,6 +7,7 @@ import {
   type RefObject,
 } from "react";
 import { Link, useNavigate } from "react-router";
+import { ROUTES } from "../routes/paths";
 import {
   ArrowLeft,
   Camera,
@@ -403,7 +404,7 @@ export default function EmprendedorCrearServicios() {
 
   const handleVerServicios = () => {
     setShowPublishModal(false);
-    navigate("/emprendedor/resultado-cargue-serv");
+    navigate(ROUTES.entrepreneur.resultadoCargue);
   };
 
   const handleDraft = () => {
@@ -425,6 +426,7 @@ export default function EmprendedorCrearServicios() {
         <div className="rounded-[24px] bg-white p-6 shadow-[0px_20px_40px_0px_rgba(13,28,46,0.06)] md:p-10">
           <button
             type="button"
+            onClick={() => navigate(ROUTES.entrepreneur.servicios)}
             className="mb-6 inline-flex items-center gap-2 font-['Inter:Medium',sans-serif] text-[14px] font-medium text-[#2d5bff] transition-opacity hover:opacity-80"
           >
             <ArrowLeft className="size-4" />

@@ -7,6 +7,7 @@ import {
   type RefObject,
 } from "react";
 import { Link, useNavigate } from "react-router";
+import { ROUTES } from "../routes/paths";
 import {
   ArrowLeft,
   Camera,
@@ -140,6 +141,8 @@ function ActiveToggle({
 }
 
 function UpdateSuccessModal() {
+  const navigate = useNavigate();
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(248,249,255,0.35)] p-6 backdrop-blur-[14px]"
@@ -159,9 +162,10 @@ function UpdateSuccessModal() {
         </p>
         <button
           type="button"
+          onClick={() => navigate(ROUTES.entrepreneur.servicios)}
           className="mt-10 flex w-full items-center justify-center rounded-[9999px] bg-gradient-to-r from-[#0040df] to-[#2d5bff] py-4 font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-opacity hover:opacity-90"
         >
-          Ir al Home
+          Ver listado de servicios
         </button>
       </div>
     </div>
@@ -198,6 +202,7 @@ function PageFooter() {
 }
 
 export default function EmprendedorEditarServicios() {
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [storeMenuOpen, setStoreMenuOpen] = useState(false);
@@ -260,6 +265,7 @@ export default function EmprendedorEditarServicios() {
         <div className="rounded-[24px] bg-white p-6 shadow-[0px_20px_40px_0px_rgba(13,28,46,0.06)] md:p-10">
           <button
             type="button"
+            onClick={() => navigate(ROUTES.entrepreneur.servicios)}
             className="mb-6 inline-flex items-center gap-2 font-['Inter:Medium',sans-serif] text-[14px] font-medium text-[#2d5bff] transition-opacity hover:opacity-80"
           >
             <ArrowLeft className="size-4" />

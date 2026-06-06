@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { Link as RouterLink } from "react-router";
 import svgPaths from "../imports/ResidenteCrearPerfil1-1/svg-9j2hvqeju1";
 import { ProfileConfirmationModal } from "../app/components/ProfileConfirmationModal";
+import { ROUTES } from "../routes/paths";
 
 function Container2() {
   return (
@@ -269,42 +271,42 @@ function Paragraph() {
   );
 }
 
-function Link() {
+function PrivacyFooterLink() {
   return (
-    <a href="#" className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
+    <RouterLink to={ROUTES.privacy} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
       <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
         <p className="leading-[20px]">Política de privacidad</p>
       </div>
-    </a>
+    </RouterLink>
   );
 }
 
-function Link2() {
+function HelpFooterLink() {
   return (
-    <a href="#" className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
+    <RouterLink to={ROUTES.help} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
       <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
         <p className="leading-[20px]">Centro de ayuda</p>
       </div>
-    </a>
+    </RouterLink>
   );
 }
 
-function Link3() {
+function ContactFooterLink() {
   return (
-    <a href="#" className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
+    <RouterLink to={ROUTES.contact} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
       <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
         <p className="leading-[20px]">Contáctenos</p>
       </div>
-    </a>
+    </RouterLink>
   );
 }
 
 function Nav() {
   return (
     <div className="content-stretch flex gap-[24px] items-start relative shrink-0 flex-wrap" data-name="Nav">
-      <Link />
-      <Link2 />
-      <Link3 />
+      <PrivacyFooterLink />
+      <HelpFooterLink />
+      <ContactFooterLink />
     </div>
   );
 }

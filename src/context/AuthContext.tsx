@@ -9,12 +9,19 @@ import {
 } from "react";
 import { authenticateUser } from "../lib/auth/credentials";
 import {
+  buildDisplayName,
+  getProfileForUser,
+  saveUserProfile,
+  withProfile,
+} from "../lib/auth/profile";
+import {
   clearSession,
   createSession,
   readSession,
   saveSession,
 } from "../lib/auth/session";
-import type { Session, SessionUser } from "../lib/auth/types";
+import type { Session, SessionUser, UserProfileData } from "../lib/auth/types";
+import type { ProfileUpdateResult } from "../lib/auth/profile";
 
 interface LoginResult {
   success: boolean;
@@ -27,6 +34,8 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (email: string, password: string) => LoginResult;
   logout: () => void;
+  updateProfile: (profile: UserProfileData) => ProfileUpdateResult;
+  getCurrentProfile: () => UserProfileData | null;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -36,7 +45,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setSession(readSession());
+    const existingSession = readSession();
+    if (existingSession) {
+      setSession({
+        ...existingSession,
+        user: withProfile(existingSession.user),
+      });
+    }
     setIsLoading(false);
   }, []);
 
@@ -62,6 +77,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
   }, []);
 
+  const getCurrentProfile = useCallback((): UserProfileData | null => {
+    if (!session?.user) return null;
+    return getProfileForUser(session.user);
+  }, [session]);
+
+  const updateProfile = useCallback(
+    (profile: UserProfileData): ProfileUpdateResult => {
+      if (!session?.user) {
+        return {
+          success: false,
+          error: "No hay una sesión activa.",
+        };
+      }
+
+      const result = saveUserProfile(session.user.id, profile);
+
+      if (!result.success) return result;
+
+      const updatedUser: SessionUser = {
+        ...session.user,
+        firstName: profile.firstName.trim(),
+        lastName: profile.lastName.trim(),
+        phone: profile.phone.trim(),
+        name: buildDisplayName(profile),
+      };
+
+      const nextSession: Session = {
+        ...session,
+        user: updatedUser,
+      };
+
+      saveSession(nextSession);
+      setSession(nextSession);
+
+      return { success: true };
+    },
+    [session],
+  );
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user: session?.user ?? null,
@@ -69,8 +123,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading,
       login,
       logout,
+      updateProfile,
+      getCurrentProfile,
     }),
-    [session, isLoading, login, logout],
+    [session, isLoading, login, logout, updateProfile, getCurrentProfile],
   );
 
   return (

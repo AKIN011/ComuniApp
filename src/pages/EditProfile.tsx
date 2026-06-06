@@ -1,6 +1,9 @@
-import { useNavigate } from "react-router";
-import { FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router";
+import { ROUTES } from "../routes/paths";
 import svgPaths from "../imports/ResidenteEditarPerfil1/svg-gqf54d49lq";
+import { useAuth } from "../context/AuthContext";
+import type { ProfileFieldErrors } from "../lib/auth/profile";
 
 function Container2() {
   return (
@@ -71,71 +74,185 @@ function Header() {
   );
 }
 
+const inputClass =
+  "bg-[#eff4ff] relative rounded-[32px] shrink-0 w-full px-[48px] py-[16px] font-['Inter:Regular',sans-serif] font-normal text-[14px] text-black outline-none focus:ring-2 focus:ring-[#0040df]";
+
+const inputErrorClass = "ring-2 ring-[#dc2626]/40";
+
 function Form() {
   const navigate = useNavigate();
+  const { user, getCurrentProfile, updateProfile } = useAuth();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ProfileFieldErrors>({});
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const profile = getCurrentProfile();
+    if (!profile) return;
+
+    setFirstName(profile.firstName);
+    setLastName(profile.lastName);
+    setPhone(profile.phone);
+  }, [user, getCurrentProfile]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setSubmitError("");
+
+    setIsSubmitting(true);
+
+    const result = updateProfile({
+      firstName,
+      lastName,
+      phone,
+    });
+
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      if (result.fieldErrors) setFieldErrors(result.fieldErrors);
+      setSubmitError(result.error ?? "No se pudo guardar el perfil.");
+      return;
+    }
+
     navigate("/perfil/editar/exito");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative shrink-0 w-full" data-name="Form">
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="relative shrink-0 w-full"
+      data-name="Form"
+    >
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col gap-[31px] items-start relative size-full">
-        
-        {/* Nombres Field */}
-        <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Nombres Field">
-          <label className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[14px] whitespace-nowrap">
+        {submitError && (
+          <p
+            role="alert"
+            className="w-full rounded-[12px] bg-[#fef2f2] px-4 py-3 text-center font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#b91c1c]"
+          >
+            {submitError}
+          </p>
+        )}
+
+        <div
+          className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full"
+          data-name="Nombres Field"
+        >
+          <label
+            htmlFor="profile-first-name"
+            className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[14px] whitespace-nowrap"
+          >
             <span className="leading-[20px]">Nombres</span>
           </label>
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full">
-            <input 
-              type="text" 
-              defaultValue="Camilo Andrés"
-              required
-              className="bg-[#eff4ff] relative rounded-[32px] shrink-0 w-full px-[48px] py-[16px] font-['Inter:Regular',sans-serif] font-normal text-[14px] text-black outline-none focus:ring-2 focus:ring-[#0040df]" 
+            <input
+              id="profile-first-name"
+              type="text"
+              value={firstName}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                if (fieldErrors.firstName) {
+                  setFieldErrors((prev) => ({ ...prev, firstName: undefined }));
+                }
+              }}
+              aria-invalid={Boolean(fieldErrors.firstName)}
+              className={`${inputClass} ${fieldErrors.firstName ? inputErrorClass : ""}`}
             />
           </div>
+          {fieldErrors.firstName && (
+            <p
+              role="alert"
+              className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+            >
+              {fieldErrors.firstName}
+            </p>
+          )}
         </div>
 
-        {/* Apellidos Field */}
-        <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Apellidos Field">
-          <label className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[14px] whitespace-nowrap">
+        <div
+          className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full"
+          data-name="Apellidos Field"
+        >
+          <label
+            htmlFor="profile-last-name"
+            className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[14px] whitespace-nowrap"
+          >
             <span className="leading-[20px]">Apellidos</span>
           </label>
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full">
-            <input 
-              type="text" 
-              defaultValue="Torres Cárdenas"
-              required
-              className="bg-[#eff4ff] relative rounded-[32px] shrink-0 w-full px-[48px] py-[16px] font-['Inter:Regular',sans-serif] font-normal text-[14px] text-black outline-none focus:ring-2 focus:ring-[#0040df]" 
+            <input
+              id="profile-last-name"
+              type="text"
+              value={lastName}
+              onChange={(e) => {
+                setLastName(e.target.value);
+                if (fieldErrors.lastName) {
+                  setFieldErrors((prev) => ({ ...prev, lastName: undefined }));
+                }
+              }}
+              aria-invalid={Boolean(fieldErrors.lastName)}
+              className={`${inputClass} ${fieldErrors.lastName ? inputErrorClass : ""}`}
             />
           </div>
+          {fieldErrors.lastName && (
+            <p
+              role="alert"
+              className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+            >
+              {fieldErrors.lastName}
+            </p>
+          )}
         </div>
 
-        {/* Celular Field */}
-        <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Celular Field">
-          <label className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[14px] whitespace-nowrap">
+        <div
+          className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full"
+          data-name="Celular Field"
+        >
+          <label
+            htmlFor="profile-phone"
+            className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[14px] whitespace-nowrap"
+          >
             <span className="leading-[20px]">Celular</span>
           </label>
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full">
-            <input 
-              type="tel" 
-              defaultValue="3005056031"
-              required
-              className="bg-[#eff4ff] relative rounded-[32px] shrink-0 w-full px-[48px] py-[16px] font-['Inter:Regular',sans-serif] font-normal text-[14px] text-black outline-none focus:ring-2 focus:ring-[#0040df]" 
+            <input
+              id="profile-phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                if (fieldErrors.phone) {
+                  setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+                }
+              }}
+              aria-invalid={Boolean(fieldErrors.phone)}
+              className={`${inputClass} ${fieldErrors.phone ? inputErrorClass : ""}`}
             />
           </div>
+          {fieldErrors.phone && (
+            <p
+              role="alert"
+              className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+            >
+              {fieldErrors.phone}
+            </p>
+          )}
         </div>
 
-        {/* Action Button */}
-        <button 
-          type="submit" 
-          className="bg-gradient-to-r content-stretch flex from-[#0040df] items-center justify-center py-[16px] rounded-[9999px] to-[#2d5bff] w-full mt-[16px] cursor-pointer hover:opacity-90 transition-opacity"
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="relative bg-gradient-to-r content-stretch flex from-[#0040df] items-center justify-center py-[16px] rounded-[9999px] to-[#2d5bff] w-full mt-[16px] cursor-pointer hover:opacity-90 transition-opacity disabled:cursor-not-allowed disabled:opacity-70"
         >
           <div className="absolute bg-[rgba(255,255,255,0)] inset-0 rounded-[9999px] shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)]" />
           <span className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[16px] text-center text-white whitespace-nowrap">
-            Guardar cambios
+            {isSubmitting ? "Guardando..." : "Guardar cambios"}
           </span>
         </button>
       </div>
@@ -168,15 +285,15 @@ export function Footer() {
             </div>
           </div>
           <div className="content-stretch flex gap-[24px] items-start relative shrink-0 flex-wrap" data-name="Nav">
-            <a href="#" className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] text-[14px] hover:text-[#0040df] whitespace-nowrap">
+            <Link to={ROUTES.privacy} className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] text-[14px] hover:text-[#0040df] whitespace-nowrap no-underline">
               <span className="leading-[20px]">Política de privacidad</span>
-            </a>
-            <a href="#" className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] text-[14px] hover:text-[#0040df] whitespace-nowrap">
+            </Link>
+            <Link to={ROUTES.help} className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] text-[14px] hover:text-[#0040df] whitespace-nowrap no-underline">
               <span className="leading-[20px]">Centro de ayuda</span>
-            </a>
-            <a href="#" className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] text-[14px] hover:text-[#0040df] whitespace-nowrap">
+            </Link>
+            <Link to={ROUTES.contact} className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] text-[14px] hover:text-[#0040df] whitespace-nowrap no-underline">
               <span className="leading-[20px]">Contáctenos</span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

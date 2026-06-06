@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { Link, useNavigate } from "react-router";
+import { ROUTES } from "../routes/paths";
 import {
   CircleHelp,
   HandHeart,
@@ -101,14 +102,25 @@ function StoreIconButton() {
 }
 
 function SidebarNav() {
+  const navigate = useNavigate();
   const items = [
-    { label: "Tablero", icon: LayoutGrid, active: false },
-    { label: "Listado de servicios", icon: HandHeart, active: true },
+    {
+      label: "Tablero",
+      icon: LayoutGrid,
+      active: false,
+      to: ROUTES.entrepreneur.tablero,
+    },
+    {
+      label: "Listado de servicios",
+      icon: HandHeart,
+      active: true,
+      to: ROUTES.entrepreneur.servicios,
+    },
     {
       label: "Editar mi perfil",
       icon: SquarePen,
       active: false,
-      to: "/emprendedor/editar-perfil",
+      to: ROUTES.entrepreneur.editarPerfil,
     },
   ];
 
@@ -123,7 +135,7 @@ function SidebarNav() {
       </Link>
 
       <nav className="flex flex-col gap-1.5">
-        {items.map(({ label, icon: Icon, active, to }) => {
+        {items.map(({ label, icon: Icon, active, to }: { label: string; icon: typeof LayoutGrid; active: boolean; to?: string }) => {
           const className = `flex w-full items-center gap-3 rounded-[14px] px-4 py-3.5 font-['Inter:Medium',sans-serif] text-[14px] leading-[20px] transition-colors ${
             active
               ? "border border-[#e2e8f0] bg-white font-semibold text-[#2d5bff] shadow-[0px_2px_8px_0px_rgba(13,28,46,0.06)]"
@@ -153,6 +165,7 @@ function SidebarNav() {
         <div className="flex flex-col gap-1">
           <button
             type="button"
+            onClick={() => navigate(ROUTES.comingSoon("Configuración"))}
             className="flex items-center gap-3 rounded-[10px] px-4 py-3 font-['Inter:Medium',sans-serif] text-[11px] uppercase tracking-[0.08em] text-[#94a3b8] transition-colors hover:text-[#64748b]"
           >
             <Settings className="size-4 shrink-0" strokeWidth={2} />
@@ -160,6 +173,7 @@ function SidebarNav() {
           </button>
           <button
             type="button"
+            onClick={() => navigate(ROUTES.help)}
             className="flex items-center gap-3 rounded-[10px] px-4 py-3 font-['Inter:Medium',sans-serif] text-[11px] uppercase tracking-[0.08em] text-[#94a3b8] transition-colors hover:text-[#64748b]"
           >
             <CircleHelp className="size-4 shrink-0" strokeWidth={2} />
@@ -215,6 +229,8 @@ function MainHeader({
 }
 
 function ActiveServiceCard({ service }: { service: ServiceCard }) {
+  const navigate = useNavigate();
+
   return (
     <article className="flex flex-col overflow-hidden rounded-[16px] bg-white shadow-[0px_4px_16px_0px_rgba(13,28,46,0.08)]">
       <div className="relative aspect-[16/10] w-full">
@@ -245,15 +261,17 @@ function ActiveServiceCard({ service }: { service: ServiceCard }) {
           <button
             type="button"
             aria-label="Editar servicio"
+            onClick={() => navigate(ROUTES.entrepreneur.crearServicio)}
             className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[#e2e8f0] bg-white text-[#64748b] transition-colors hover:border-[#cbd5e1] hover:text-[#0d1c2e]"
           >
             <Pencil className="size-3.5" strokeWidth={2} />
           </button>
           <button
             type="button"
+            onClick={() => navigate(ROUTES.entrepreneur.servicios)}
             className="flex-1 rounded-[9999px] bg-[#065f46] py-2 font-['Inter:Semi_Bold',sans-serif] text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
           >
-            Desactivar
+            Gestionar en listado
           </button>
         </div>
       </div>
@@ -306,7 +324,7 @@ function InactiveServiceCard({ service }: { service: ServiceCard }) {
 function AddServiceCard() {
   return (
     <Link
-      to="/emprendedor/crear-servicios"
+      to={ROUTES.entrepreneur.crearServicio}
       className="flex min-h-full flex-col items-center justify-center rounded-[16px] border-2 border-dashed border-[#c5d9f5] bg-[#f8fafc] px-6 py-10 text-center transition-colors hover:border-[#94a3b8] hover:bg-[#f1f5f9]"
     >
       <div className="mb-5 flex size-[52px] items-center justify-center rounded-full bg-[#dce9ff]">
