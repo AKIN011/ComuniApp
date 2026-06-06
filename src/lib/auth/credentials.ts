@@ -21,6 +21,13 @@ const DEMO_USERS: StoredUser[] = [
     name: "Residente Demo",
     role: "resident",
   },
+  {
+    id: "demo-entrepreneur",
+    email: "emprendedor@comuniapp.com",
+    password: "emprendedor123",
+    name: "Emprendedor Demo",
+    role: "entrepreneur",
+  },
 ];
 
 function readStoredUsers(): StoredUser[] {

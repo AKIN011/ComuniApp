@@ -9,6 +9,7 @@ export const ROUTES = {
   serviceHistory: "/historial",
   register: "/registro",
   registerEntrepreneur: "/registro/emprendedor",
+  registerEntrepreneurCreateProfile: "/registro/emprendedor/crear-perfil",
   registerCreateProfile: "/registro/crear-perfil",
   editProfile: "/perfil/editar",
   editProfileSuccess: "/perfil/editar/exito",
@@ -27,6 +28,7 @@ export const ROUTES = {
     tablero: "/emprendedor/tablero",
     servicios: "/emprendedor/servicios",
     crearServicio: "/emprendedor/servicios/crear",
+    editarServicio: "/emprendedor/servicios/editar",
     editarPerfil: "/emprendedor/perfil/editar",
     /** @deprecated use crearServicio */
     crearServiciosLegacy: "/emprendedor/crear-servicios",

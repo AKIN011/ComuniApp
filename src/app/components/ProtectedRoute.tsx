@@ -1,8 +1,20 @@
 import { Navigate, useLocation } from "react-router";
 import { useAuth } from "../../context/AuthContext";
+import type { UserRole } from "../../lib/auth/types";
+import { ROUTES } from "../../routes/paths";
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole?: UserRole;
+  loginPath?: string;
+}
+
+export function ProtectedRoute({
+  children,
+  requiredRole,
+  loginPath = ROUTES.login,
+}: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -14,7 +26,15 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to={loginPath} replace state={{ from: location.pathname }} />;
+  }
+
+  if (requiredRole && user?.role !== requiredRole) {
+    const redirectTo =
+      user?.role === "entrepreneur"
+        ? ROUTES.entrepreneur.tablero
+        : ROUTES.dashboard;
+    return <Navigate to={redirectTo} replace />;
   }
 
   return children;

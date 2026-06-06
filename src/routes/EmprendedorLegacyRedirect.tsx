@@ -3,7 +3,7 @@ import { ROUTES } from "./paths";
 
 const LEGACY_EMPRENDEDOR_PATHS: Record<string, string> = {
   "/emprendedor/crear-servicios": ROUTES.entrepreneur.crearServicio,
-  "/emprendedor/editar-servicios": ROUTES.entrepreneur.servicios,
+  "/emprendedor/editar-servicios": ROUTES.entrepreneur.editarServicio,
   "/emprendedor/editar-perfil": ROUTES.entrepreneur.editarPerfil,
 };
 

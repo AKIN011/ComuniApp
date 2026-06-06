@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../routes/paths";
+import { useAuth } from "../context/AuthContext";
+import { buildDisplayName } from "../lib/auth/profile";
 import {
   Check,
   LineChart,
@@ -95,21 +97,30 @@ function toggleSection(current: EditSection, section: EditSection): EditSection 
   return current === section ? null : section;
 }
 
+function splitFullName(fullName: string): { firstName: string; lastName: string } {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  const firstName = parts[0] ?? "";
+  const lastName = parts.length > 1 ? parts.slice(1).join(" ") : firstName;
+  return { firstName, lastName };
+}
+
 export default function EmprendedorEditarPerfil() {
   const navigate = useNavigate();
+  const { user, getCurrentProfile, updateProfile } = useAuth();
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [editingSection, setEditingSection] = useState<EditSection>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const [profilePhoto, setProfilePhoto] = useState(
     "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400&q=80",
   );
   const [verifiedBadge, setVerifiedBadge] = useState("TECNICO VERIFICADO");
-  const [name, setName] = useState("Juan Diego Moreno");
+  const [name, setName] = useState("");
   const [profession, setProfession] = useState("Electricista");
   const [mission, setMission] = useState(DEFAULT_MISSION);
-  const [email, setEmail] = useState("juandielec@gmail.com");
-  const [phone, setPhone] = useState("3008581471");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [officeLocation, setOfficeLocation] = useState("CR 35 #12 -10, El Remanso");
   const [whatsapp, setWhatsapp] = useState("wa.link/d5ihkd");
   const [tags, setTags] = useState<string[]>(DEFAULT_TAGS);
@@ -125,10 +136,37 @@ export default function EmprendedorEditarPerfil() {
   };
 
   useEffect(() => {
+    if (!user) return;
+
+    const profile = getCurrentProfile();
+    setName(profile ? buildDisplayName(profile) : user.name);
+    setPhone(profile?.phone ?? user.phone ?? "");
+    setEmail(user.email);
+  }, [user, getCurrentProfile]);
+
+  useEffect(() => {
     return () => {
       if (profilePhoto.startsWith("blob:")) URL.revokeObjectURL(profilePhoto);
     };
   }, [profilePhoto]);
+
+  const handleSaveChanges = () => {
+    setSaveError("");
+
+    const { firstName, lastName } = splitFullName(name);
+    const result = updateProfile({
+      firstName,
+      lastName,
+      phone: phone.trim(),
+    });
+
+    if (!result.success) {
+      setSaveError(result.error ?? "No se pudieron guardar los cambios.");
+      return;
+    }
+
+    setShowSuccessModal(true);
+  };
 
   const handleAddTag = () => {
     const trimmed = newTag.trim();
@@ -270,10 +308,19 @@ export default function EmprendedorEditarPerfil() {
               )}
             </div>
 
+            {saveError && (
+              <p
+                role="alert"
+                className="rounded-[12px] bg-[#fef2f2] px-4 py-3 font-['Inter:Medium',sans-serif] text-[14px] font-medium text-[#b91c1c]"
+              >
+                {saveError}
+              </p>
+            )}
+
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
-                onClick={() => setShowSuccessModal(true)}
+                onClick={handleSaveChanges}
                 className="rounded-[9999px] bg-[#2d5bff] px-6 py-3 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(45,91,255,0.35)] transition-opacity hover:opacity-90 sm:px-8 sm:text-[15px]"
               >
                 Guardar cambios

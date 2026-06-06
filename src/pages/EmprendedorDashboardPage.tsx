@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { Link } from "react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router";
 import { Clock, Megaphone, Plus, Pencil } from "lucide-react";
 import {
   DashboardServiceCard,
@@ -10,26 +10,38 @@ import {
   TrendIndicator,
 } from "../app/components/emprendedor/ServiceCards";
 import {
-  dashboardPublishedServices,
-  EMPRENDEDOR_USER_NAME,
+  activeServices as initialActiveServices,
+  getEntrepreneurFirstName,
+  inactiveServices as initialInactiveServices,
 } from "../app/components/emprendedor/emprendedorData";
-import { mergePublishedServiceWithLists } from "../app/utils/emprendedorServicioStorage";
+import { useAuth } from "../context/AuthContext";
+import { buildEmprendedorServiceLists } from "../app/utils/emprendedorServicioStorage";
 import { EMPRENDEDOR_ROUTES } from "../lib/emprendedorRoutes";
 
 export default function EmprendedorDashboardPage() {
+  const { user } = useAuth();
+  const location = useLocation();
+  const [refreshToken, setRefreshToken] = useState(0);
+
   const publishedServices = useMemo(
     () =>
-      mergePublishedServiceWithLists(dashboardPublishedServices, [])
-        .activeServices,
-    [],
+      buildEmprendedorServiceLists(
+        initialActiveServices,
+        initialInactiveServices,
+      ).activeServices,
+    [refreshToken],
   );
+
+  useEffect(() => {
+    setRefreshToken((token) => token + 1);
+  }, [location.key]);
 
   return (
     <div data-name="EMPRENDEDOR DASHBOARD">
       <div className="mb-8 flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
         <div className="min-w-0 flex-1">
           <h1 className="font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[36px] font-bold leading-[44px] tracking-[-0.8px] text-[#0d1c2e]">
-            Hola, {EMPRENDEDOR_USER_NAME}
+            Hola, {getEntrepreneurFirstName(user)}
           </h1>
           <p className="mt-2 max-w-[640px] font-['Inter:Regular',sans-serif] text-[16px] leading-[26px] text-[#64748b]">
             La presencia de tu mercado comunitario está creciendo. Esto es lo

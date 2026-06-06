@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { registerNewUser } from "../lib/auth/credentials";
+import { useAuth } from "../context/AuthContext";
 import {
   validateLoginForm,
   type LoginFieldErrors,
@@ -56,6 +57,7 @@ const inputErrorClass = "ring-2 ring-[#dc2626]/40";
 
 export default function RegistroEmprendedor() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [email, setEmail] = useState("");
@@ -85,12 +87,22 @@ export default function RegistroEmprendedor() {
       return;
     }
 
+    const loginResult = login(email, password, "entrepreneur");
+
+    if (!loginResult.success) {
+      setSubmitError(
+        loginResult.error ??
+          "Registro completado, pero no se pudo iniciar sesión. Inicia sesión manualmente.",
+      );
+      return;
+    }
+
     setShowWelcomeModal(true);
   };
 
   const continueToProfile = () => {
     setShowWelcomeModal(false);
-    navigate("/registro/emprendedor/crear-perfil");
+    navigate(ROUTES.registerEntrepreneurCreateProfile);
   };
 
   return (

@@ -10,7 +10,10 @@ import {
 } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { ROUTES } from "../../../routes/paths";
-import type { EmprendedorService } from "./emprendedorData";
+import {
+  toEditServiceNavigationState,
+  type EmprendedorService,
+} from "./emprendedorData";
 
 const statusBadge: Record<
   EmprendedorService["status"],
@@ -154,8 +157,8 @@ export function ListActiveServiceCard({
             type="button"
             aria-label="Editar servicio"
             onClick={() =>
-              navigate(ROUTES.entrepreneur.crearServicio, {
-                state: { serviceId: service.id },
+              navigate(ROUTES.entrepreneur.editarServicio, {
+                state: toEditServiceNavigationState(service),
               })
             }
             className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-[#e2e8f0] bg-white text-[#64748b] transition-colors hover:border-[#2d5bff]/30 hover:text-[#2d5bff]"

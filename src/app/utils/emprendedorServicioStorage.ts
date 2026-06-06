@@ -1,4 +1,7 @@
-import type { EmprendedorService } from "../components/emprendedor/emprendedorData";
+import type {
+  EmprendedorService,
+  ServiceStatus,
+} from "../components/emprendedor/emprendedorData";
 
 export type StoredEmprendedorServicio = {
   id: number;
@@ -11,7 +14,149 @@ export type StoredEmprendedorServicio = {
 };
 
 const STORAGE_KEY = "comuniapp_emprendedor_last_service";
+const OVERRIDES_STORAGE_KEY = "comuniapp_emprendedor_service_overrides";
 export const PUBLISHED_SERVICE_ID_PREFIX = "published-";
+
+type ServiceOverride = {
+  title?: string;
+  description?: string;
+  image?: string;
+  status?: ServiceStatus;
+  deleted?: boolean;
+};
+
+function readServiceOverrides(): Record<string, ServiceOverride> {
+  try {
+    const raw = sessionStorage.getItem(OVERRIDES_STORAGE_KEY);
+    if (!raw) return {};
+
+    const overrides = JSON.parse(raw) as Record<string, ServiceOverride>;
+    return overrides && typeof overrides === "object" ? overrides : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeServiceOverrides(overrides: Record<string, ServiceOverride>): void {
+  sessionStorage.setItem(OVERRIDES_STORAGE_KEY, JSON.stringify(overrides));
+}
+
+export function saveServiceOverride(
+  serviceId: string,
+  override: ServiceOverride,
+): void {
+  const overrides = readServiceOverrides();
+  overrides[serviceId] = { ...overrides[serviceId], ...override };
+  writeServiceOverrides(overrides);
+}
+
+export function removeServiceOverride(serviceId: string): void {
+  const overrides = readServiceOverrides();
+  delete overrides[serviceId];
+  writeServiceOverrides(overrides);
+}
+
+function resolveServiceStatus(
+  active: boolean,
+  originalStatus?: ServiceStatus,
+): ServiceStatus {
+  if (!active) return "inactivo";
+  if (originalStatus === "en_revision") return "en_revision";
+  return "activo";
+}
+
+export function applyServiceOverride(
+  service: EmprendedorService,
+): EmprendedorService | null {
+  const override = readServiceOverrides()[service.id];
+  if (!override) return service;
+  if (override.deleted) return null;
+
+  return {
+    ...service,
+    title: override.title ?? service.title,
+    description: override.description ?? service.description,
+    image: override.image ?? service.image,
+    status: override.status ?? service.status,
+  };
+}
+
+function collectBaseServices(
+  activeServices: EmprendedorService[],
+  inactiveServices: EmprendedorService[],
+): EmprendedorService[] {
+  const merged = mergePublishedServiceWithLists(activeServices, inactiveServices);
+  const byId = new Map<string, EmprendedorService>();
+
+  for (const service of [
+    ...merged.activeServices,
+    ...merged.inactiveServices,
+  ]) {
+    byId.set(service.id, service);
+  }
+
+  return [...byId.values()];
+}
+
+export function buildEmprendedorServiceLists(
+  activeServices: EmprendedorService[],
+  inactiveServices: EmprendedorService[],
+): {
+  activeServices: EmprendedorService[];
+  inactiveServices: EmprendedorService[];
+} {
+  const services = collectBaseServices(activeServices, inactiveServices)
+    .map(applyServiceOverride)
+    .filter((service): service is EmprendedorService => service !== null);
+
+  return {
+    activeServices: services.filter(
+      (service) =>
+        service.status === "activo" || service.status === "en_revision",
+    ),
+    inactiveServices: services.filter(
+      (service) => service.status === "inactivo",
+    ),
+  };
+}
+
+export async function saveServiceEdit({
+  serviceId,
+  title,
+  description,
+  image,
+  active,
+  originalStatus,
+}: {
+  serviceId: string;
+  title: string;
+  description: string;
+  image: string;
+  active: boolean;
+  originalStatus?: ServiceStatus;
+}): Promise<void> {
+  const status = resolveServiceStatus(active, originalStatus);
+
+  saveServiceOverride(serviceId, {
+    title,
+    description,
+    image,
+    status,
+  });
+
+  if (isPublishedServiceId(serviceId)) {
+    const stored = getPublishedService();
+    if (stored) {
+      savePublishedService({
+        ...stored,
+        title,
+        description,
+        active,
+        imageUrl: image,
+      });
+    }
+  }
+}
 
 export function getPublishedServiceId(storedId: number): string {
   return `${PUBLISHED_SERVICE_ID_PREFIX}${storedId}`;

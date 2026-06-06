@@ -20,7 +20,12 @@ import {
   readSession,
   saveSession,
 } from "../lib/auth/session";
-import type { Session, SessionUser, UserProfileData } from "../lib/auth/types";
+import type {
+  Session,
+  SessionUser,
+  UserProfileData,
+  UserRole,
+} from "../lib/auth/types";
 import type { ProfileUpdateResult } from "../lib/auth/profile";
 
 interface LoginResult {
@@ -32,7 +37,7 @@ interface AuthContextValue {
   user: SessionUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => LoginResult;
+  login: (email: string, password: string, role?: UserRole) => LoginResult;
   logout: () => void;
   updateProfile: (profile: UserProfileData) => ProfileUpdateResult;
   getCurrentProfile: () => UserProfileData | null;
@@ -55,22 +60,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = useCallback((email: string, password: string): LoginResult => {
-    const user = authenticateUser(email, password);
+  const login = useCallback(
+    (email: string, password: string, role?: UserRole): LoginResult => {
+      const user = authenticateUser(email, password);
 
-    if (!user) {
-      return {
-        success: false,
-        error: "Correo o contraseña incorrectos. Verifica tus datos.",
-      };
-    }
+      if (!user) {
+        return {
+          success: false,
+          error: "Correo o contraseña incorrectos. Verifica tus datos.",
+        };
+      }
 
-    const nextSession = createSession(user);
-    saveSession(nextSession);
-    setSession(nextSession);
+      if (role && user.role !== role) {
+        return {
+          success: false,
+          error:
+            role === "entrepreneur"
+              ? "Esta cuenta no está registrada como emprendedor. Usa el inicio de sesión de residente o regístrate como emprendedor."
+              : "Esta cuenta no está registrada como residente. Usa el inicio de sesión de emprendedor.",
+        };
+      }
 
-    return { success: true };
-  }, []);
+      const nextSession = createSession(user);
+      saveSession(nextSession);
+      setSession(nextSession);
+
+      return { success: true };
+    },
+    [],
+  );
 
   const logout = useCallback(() => {
     clearSession();

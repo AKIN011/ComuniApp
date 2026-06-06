@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState, type FormEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
 import {
   Eye,
   EyeOff,
@@ -12,6 +12,11 @@ import {
 } from "lucide-react";
 import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
 import { ROUTES } from "../routes/paths";
+import { useAuth } from "../context/AuthContext";
+import {
+  validateLoginForm,
+  type LoginFieldErrors,
+} from "../lib/auth/validation";
 
 function LoginFooter() {
   return (
@@ -46,9 +51,45 @@ function LoginFooter() {
 const inputBaseClass =
   "h-[52px] w-full rounded-[14px] border-none bg-[#eef4fc] pl-12 pr-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30";
 
+const inputErrorClass = "ring-2 ring-[#dc2626]/40";
+
 export default function LoginEmprendedorPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({});
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const redirectTo =
+    (location.state as { from?: string } | null)?.from ??
+    ROUTES.entrepreneur.tablero;
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitError("");
+
+    const validation = validateLoginForm({ email, password });
+    setFieldErrors(validation.errors);
+
+    if (!validation.isValid) return;
+
+    setIsSubmitting(true);
+
+    const result = login(email, password, "entrepreneur");
+
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      setSubmitError(result.error ?? "No se pudo iniciar sesión.");
+      return;
+    }
+
+    navigate(redirectTo, { replace: true });
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f8f9ff]">
@@ -68,13 +109,16 @@ export default function LoginEmprendedorPage() {
               </p>
             </div>
 
-            <form
-              className="flex flex-col gap-5"
-              onSubmit={(e) => {
-                e.preventDefault();
-                navigate(ROUTES.entrepreneur.tablero);
-              }}
-            >
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
+              {submitError && (
+                <p
+                  role="alert"
+                  className="rounded-[12px] bg-[#fef2f2] px-4 py-3 text-center font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#b91c1c]"
+                >
+                  {submitError}
+                </p>
+              )}
+
               <div className="flex flex-col gap-2">
                 <label
                   className="font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#334155]"
@@ -92,9 +136,29 @@ export default function LoginEmprendedorPage() {
                     type="email"
                     autoComplete="email"
                     placeholder="name@company.com"
-                    className={inputBaseClass}
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (fieldErrors.email) {
+                        setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                      }
+                    }}
+                    aria-invalid={Boolean(fieldErrors.email)}
+                    aria-describedby={
+                      fieldErrors.email ? "emprendedor-email-error" : undefined
+                    }
+                    className={`${inputBaseClass} ${fieldErrors.email ? inputErrorClass : ""}`}
                   />
                 </div>
+                {fieldErrors.email && (
+                  <p
+                    id="emprendedor-email-error"
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.email}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">
@@ -122,7 +186,23 @@ export default function LoginEmprendedorPage() {
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     placeholder="••••••••"
-                    className={`${inputBaseClass} pr-12`}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (fieldErrors.password) {
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          password: undefined,
+                        }));
+                      }
+                    }}
+                    aria-invalid={Boolean(fieldErrors.password)}
+                    aria-describedby={
+                      fieldErrors.password
+                        ? "emprendedor-password-error"
+                        : undefined
+                    }
+                    className={`${inputBaseClass} pr-12 ${fieldErrors.password ? inputErrorClass : ""}`}
                   />
                   <button
                     type="button"
@@ -139,13 +219,23 @@ export default function LoginEmprendedorPage() {
                     )}
                   </button>
                 </div>
+                {fieldErrors.password && (
+                  <p
+                    id="emprendedor-password-error"
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.password}
+                  </p>
+                )}
               </div>
 
               <button
                 type="submit"
-                className="mt-2 h-[52px] w-full cursor-pointer rounded-[9999px] bg-[#2d5bff] font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[16px] font-bold leading-[24px] text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.25),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-all duration-200 hover:bg-[#1a4de8] active:scale-[0.98]"
+                disabled={isSubmitting}
+                className="mt-2 h-[52px] w-full cursor-pointer rounded-[9999px] bg-[#2d5bff] font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[16px] font-bold leading-[24px] text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.25),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-all duration-200 hover:bg-[#1a4de8] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Iniciar sesión
+                {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
               </button>
             </form>
 

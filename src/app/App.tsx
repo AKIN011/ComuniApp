@@ -11,6 +11,7 @@ import ResidenteCrearPerfil from "../pages/ResidenteCrearPerfil";
 import { EditProfile } from "../pages/EditProfile";
 import { EditProfileSuccess } from "../pages/EditProfileSuccess";
 import EmprendedorCrearServicios from "../pages/EmprendedorCrearServicios";
+import EmprendedorEditarServicios from "../pages/EmprendedorEditarServicios";
 import EmprendedorEditarPerfil from "../pages/EmprendedorEditarPerfil";
 import RegistroEmprendedor from "../pages/RegistroEmprendedor";
 import CrearPerfilEmprendedor from "../pages/CrearPerfilEmprendedor";
@@ -51,7 +52,7 @@ const router = createBrowserRouter([
   {
     path: ROUTES.dashboard,
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="resident">
         <ResidentDashboardPage />
       </ProtectedRoute>
     ),
@@ -59,7 +60,7 @@ const router = createBrowserRouter([
   {
     path: ROUTES.serviceHistory,
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="resident">
         <ServiceHistoryPage />
       </ProtectedRoute>
     ),
@@ -67,7 +68,7 @@ const router = createBrowserRouter([
   {
     path: "/services/:categorySlug",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="resident">
         <SearchResultsPage />
       </ProtectedRoute>
     ),
@@ -75,7 +76,7 @@ const router = createBrowserRouter([
   {
     path: "/categorias/:legacySlug",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="resident">
         <LegacyCategoryRedirect />
       </ProtectedRoute>
     ),
@@ -83,7 +84,7 @@ const router = createBrowserRouter([
   {
     path: "/service/:slug",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="resident">
         <ServiceDetailsPage />
       </ProtectedRoute>
     ),
@@ -95,14 +96,21 @@ const router = createBrowserRouter([
   { path: ROUTES.register, element: <ResidenteRegistro /> },
   { path: ROUTES.registerEntrepreneur, element: <RegistroEmprendedor /> },
   {
-    path: "/registro/emprendedor/crear-perfil",
-    element: <CrearPerfilEmprendedor />,
+    path: ROUTES.registerEntrepreneurCreateProfile,
+    element: (
+      <ProtectedRoute
+        requiredRole="entrepreneur"
+        loginPath={ROUTES.registerEntrepreneur}
+      >
+        <CrearPerfilEmprendedor />
+      </ProtectedRoute>
+    ),
   },
   { path: ROUTES.registerCreateProfile, element: <ResidenteCrearPerfil /> },
   {
     path: ROUTES.editProfile,
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="resident">
         <EditProfile />
       </ProtectedRoute>
     ),
@@ -110,14 +118,21 @@ const router = createBrowserRouter([
   {
     path: ROUTES.editProfileSuccess,
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="resident">
         <EditProfileSuccess />
       </ProtectedRoute>
     ),
   },
   {
     path: "/emprendedor",
-    element: <EmprendedorLayout />,
+    element: (
+      <ProtectedRoute
+        requiredRole="entrepreneur"
+        loginPath={ROUTES.loginEntrepreneur}
+      >
+        <EmprendedorLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <Navigate to="tablero" replace /> },
       { path: "tablero", element: <EmprendedorDashboardPage /> },
@@ -127,7 +142,25 @@ const router = createBrowserRouter([
   },
   {
     path: ROUTES.entrepreneur.crearServicio,
-    element: <EmprendedorCrearServicios />,
+    element: (
+      <ProtectedRoute
+        requiredRole="entrepreneur"
+        loginPath={ROUTES.loginEntrepreneur}
+      >
+        <EmprendedorCrearServicios />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.entrepreneur.editarServicio,
+    element: (
+      <ProtectedRoute
+        requiredRole="entrepreneur"
+        loginPath={ROUTES.loginEntrepreneur}
+      >
+        <EmprendedorEditarServicios />
+      </ProtectedRoute>
+    ),
   },
   {
     path: ROUTES.entrepreneur.crearServiciosLegacy,
