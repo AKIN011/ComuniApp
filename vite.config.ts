@@ -16,6 +16,8 @@ function figmaAssetResolver() {
   }
 }
 
+const nodeMajor = Number(process.versions.node.split('.')[0])
+
 export default defineConfig({
   plugins: [
     figmaAssetResolver(),
@@ -33,4 +35,12 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    ...(nodeMajor >= 25 ? { execArgv: ['--no-webstorage'] } : {}),
+    setupFiles: ['./tests/setup.ts'],
+    include: ['tests/**/*.{test,spec}.{ts,tsx}'],
+  },
 })
