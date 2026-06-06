@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
-import { Link, useNavigate } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 import { ROUTES } from "../routes/paths";
 import {
   Check,
@@ -9,7 +9,6 @@ import {
   Pencil,
   Phone,
   Share2,
-  Store,
 } from "lucide-react";
 
 const DEFAULT_TAGS = [
@@ -31,85 +30,6 @@ type EditSection =
   | "contact"
   | "skills"
   | null;
-
-function useClickOutside(
-  ref: RefObject<HTMLElement | null>,
-  handler: () => void,
-  enabled: boolean,
-) {
-  useEffect(() => {
-    if (!enabled) return;
-    const onPointerDown = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        handler();
-      }
-    };
-    document.addEventListener("mousedown", onPointerDown);
-    return () => document.removeEventListener("mousedown", onPointerDown);
-  }, [ref, handler, enabled]);
-}
-
-function StoreIconButton() {
-  return (
-    <span className="flex size-10 items-center justify-center rounded-full bg-[#f5e1c8]">
-      <Store className="size-5 text-[#1e3a5f]" strokeWidth={2} />
-    </span>
-  );
-}
-
-function PageHeader({
-  menuOpen,
-  onToggleMenu,
-}: {
-  menuOpen: boolean;
-  onToggleMenu: () => void;
-}) {
-  const navigate = useNavigate();
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useClickOutside(menuRef, () => {
-    if (menuOpen) onToggleMenu();
-  }, menuOpen);
-
-  return (
-    <header className="sticky top-0 z-30 border-b border-[#e8eef8] bg-[#f8f9ff]/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-6 md:px-8">
-        <Link
-          to="/"
-          className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[22px] font-extrabold leading-[28px] tracking-[-0.5px]"
-        >
-          <span className="text-[#2d5bff]">Comuni</span>
-          <span className="text-[#22c55e]">App</span>
-        </Link>
-
-        <div className="relative" ref={menuRef}>
-          <button
-            type="button"
-            aria-expanded={menuOpen}
-            aria-haspopup="true"
-            aria-label="Menú de tienda"
-            onClick={onToggleMenu}
-            className="cursor-pointer rounded-full transition-opacity hover:opacity-90"
-          >
-            <StoreIconButton />
-          </button>
-
-          {menuOpen && (
-            <div className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-[12px] bg-[#d6e4f8] px-6 py-5 shadow-[0px_12px_24px_0px_rgba(13,28,46,0.12)]">
-              <button
-                type="button"
-                className="w-full text-center font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#0d1c2e] underline decoration-[#0d1c2e] underline-offset-4 transition-colors hover:text-[#2d5bff] hover:decoration-[#2d5bff]"
-                onClick={() => navigate("/")}
-              >
-                Cerrar sesión
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </header>
-  );
-}
 
 function EditPencilButton({
   active,
@@ -171,36 +91,6 @@ function ProfileUpdateSuccessModal() {
   );
 }
 
-function PageFooter() {
-  const links = ["Política de privacidad", "Centro de ayuda", "Contáctenos"];
-
-  return (
-    <footer className="mt-12 w-full bg-[#eff4ff] px-6 py-12 md:px-8">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-6">
-        <div className="flex flex-col gap-2">
-          <span className="font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[20px] font-bold leading-[28px] text-[#0d1c2e]">
-            ComuniApp
-          </span>
-          <p className="font-['Inter:Regular',sans-serif] text-[14px] leading-[20px] text-[rgba(13,28,46,0.7)]">
-            © 2024 ComuniApp. Cultivando el comercio comunitario.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-8">
-          {links.map((label) => (
-            <button
-              key={label}
-              type="button"
-              className="font-['Inter:Regular',sans-serif] text-[14px] leading-[20px] text-[#475569] transition-colors hover:text-[#2d5bff]"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 function toggleSection(current: EditSection, section: EditSection): EditSection {
   return current === section ? null : section;
 }
@@ -208,7 +98,6 @@ function toggleSection(current: EditSection, section: EditSection): EditSection 
 export default function EmprendedorEditarPerfil() {
   const navigate = useNavigate();
   const photoInputRef = useRef<HTMLInputElement>(null);
-  const [storeMenuOpen, setStoreMenuOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<EditSection>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -256,17 +145,20 @@ export default function EmprendedorEditarPerfil() {
     "w-full rounded-[12px] bg-white px-3 py-2 font-['Inter:Regular',sans-serif] text-[14px] text-[#0d1c2e] outline-none ring-2 ring-[#2d5bff]/30";
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f8f9ff]">
-      <PageHeader
-        menuOpen={storeMenuOpen}
-        onToggleMenu={() => setStoreMenuOpen((o) => !o)}
-      />
+    <div data-name="EMPRENDEDOR EDITAR PERFIL">
+      <header className="mb-8">
+        <h1 className="font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[36px] font-bold leading-[44px] tracking-[-0.8px] text-[#0d1c2e]">
+          Editar mi perfil
+        </h1>
+        <p className="mt-2 max-w-[640px] font-['Inter:Regular',sans-serif] text-[16px] leading-[26px] text-[#64748b]">
+          Actualiza tu información pública, contacto y habilidades para la
+          comunidad.
+        </p>
+      </header>
 
-      <main className="mx-auto w-full max-w-[1280px] flex-1 px-6 py-8 md:px-8 md:py-10">
-        {/* Perfil superior */}
-        <section className="mb-8 flex flex-col gap-8 lg:flex-row">
+      <section className="mb-8 flex flex-col gap-6 xl:flex-row xl:items-start">
           <div className="relative shrink-0">
-            <div className="size-[220px] overflow-hidden rounded-[24px] bg-[#eef4fc] md:size-[260px]">
+            <div className="size-[180px] overflow-hidden rounded-[24px] bg-[#eef4fc] sm:size-[200px] xl:size-[220px]">
               <img
                 src={profilePhoto}
                 alt={name}
@@ -342,10 +234,10 @@ export default function EmprendedorEditarPerfil() {
               </div>
             ) : (
               <>
-                <h1 className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[32px] font-extrabold leading-[40px] tracking-[-0.5px] text-[#0d1c2e] md:text-[40px]">
+                <h1 className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[28px] font-extrabold leading-[36px] tracking-[-0.5px] text-[#0d1c2e] md:text-[32px] md:leading-[40px]">
                   {name}
                 </h1>
-                <p className="font-['Inter:Semi_Bold',sans-serif] text-[18px] font-semibold text-[#2d5bff]">
+                <p className="font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-[#2d5bff] md:text-[18px]">
                   {profession}
                 </p>
               </>
@@ -382,14 +274,14 @@ export default function EmprendedorEditarPerfil() {
               <button
                 type="button"
                 onClick={() => setShowSuccessModal(true)}
-                className="rounded-[9999px] bg-[#2d5bff] px-8 py-3 font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(45,91,255,0.35)] transition-opacity hover:opacity-90"
+                className="rounded-[9999px] bg-[#2d5bff] px-6 py-3 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(45,91,255,0.35)] transition-opacity hover:opacity-90 sm:px-8 sm:text-[15px]"
               >
                 Guardar cambios
               </button>
               <button
                 type="button"
                 onClick={() => navigate(ROUTES.entrepreneur.tablero)}
-                className="rounded-[9999px] bg-[#dce9ff] px-8 py-3 font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold text-[#0040df] transition-colors hover:bg-[#c5d9f5]"
+                className="rounded-[9999px] bg-[#dce9ff] px-6 py-3 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold text-[#0040df] transition-colors hover:bg-[#c5d9f5] sm:px-8 sm:text-[15px]"
               >
                 Vista previa del perfil
               </button>
@@ -397,8 +289,7 @@ export default function EmprendedorEditarPerfil() {
           </div>
         </section>
 
-        {/* Contacto + estadísticas */}
-        <section className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+        <section className="mb-8 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_300px]">
           <div className="relative rounded-[20px] bg-white p-6 shadow-[0px_8px_24px_0px_rgba(13,28,46,0.06)]">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[20px] font-bold text-[#0d1c2e]">
@@ -492,13 +383,12 @@ export default function EmprendedorEditarPerfil() {
           </div>
         </section>
 
-        {/* Mapa + experiencia */}
-        <section className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,260px)_1fr]">
           <div className="relative overflow-hidden rounded-[20px] shadow-[0px_8px_24px_0px_rgba(13,28,46,0.08)]">
             <img
               src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&q=80"
               alt="Mapa de operación"
-              className="h-[220px] w-full object-cover brightness-[0.55] contrast-[1.1] lg:h-full lg:min-h-[240px]"
+              className="h-[200px] w-full object-cover brightness-[0.55] contrast-[1.1] xl:h-full xl:min-h-[220px]"
             />
             <div className="absolute bottom-4 left-4 rounded-[9999px] bg-white px-4 py-2 shadow-md">
               <p className="font-['Inter:Medium',sans-serif] text-[12px] font-medium text-[#0d1c2e]">
@@ -594,9 +484,6 @@ export default function EmprendedorEditarPerfil() {
             )}
           </div>
         </section>
-      </main>
-
-      <PageFooter />
 
       {showSuccessModal && <ProfileUpdateSuccessModal />}
     </div>

@@ -14,7 +14,6 @@ import EmprendedorCrearServicios from "../pages/EmprendedorCrearServicios";
 import EmprendedorEditarPerfil from "../pages/EmprendedorEditarPerfil";
 import RegistroEmprendedor from "../pages/RegistroEmprendedor";
 import CrearPerfilEmprendedor from "../pages/CrearPerfilEmprendedor";
-import EmprendResultCargueServ from "../pages/EmprendResultCargueServ";
 import EmprendedorDashboardPage from "../pages/EmprendedorDashboardPage";
 import EmprendedorServiciosListPage from "../pages/EmprendedorServiciosListPage";
 import ContentPage from "../pages/ContentPage";
@@ -123,19 +122,12 @@ const router = createBrowserRouter([
       { index: true, element: <Navigate to="tablero" replace /> },
       { path: "tablero", element: <EmprendedorDashboardPage /> },
       { path: "servicios", element: <EmprendedorServiciosListPage /> },
+      { path: "perfil/editar", element: <EmprendedorEditarPerfil /> },
     ],
   },
   {
     path: ROUTES.entrepreneur.crearServicio,
     element: <EmprendedorCrearServicios />,
-  },
-  {
-    path: ROUTES.entrepreneur.editarPerfil,
-    element: <EmprendedorEditarPerfil />,
-  },
-  {
-    path: ROUTES.entrepreneur.resultadoCargue,
-    element: <EmprendResultCargueServ />,
   },
   {
     path: ROUTES.entrepreneur.crearServiciosLegacy,

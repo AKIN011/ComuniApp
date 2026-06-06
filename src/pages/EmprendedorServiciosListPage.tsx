@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { EmprendedorService } from "../app/components/emprendedor/emprendedorData";
 import {
   activeServices as initialActiveServices,
@@ -14,12 +14,27 @@ import {
   ListActiveServiceCard,
   ListInactiveServiceCard,
 } from "../app/components/emprendedor/ServiceCards";
+import {
+  clearPublishedService,
+  isPublishedServiceId,
+  mergePublishedServiceWithLists,
+  updatePublishedServiceActive,
+} from "../app/utils/emprendedorServicioStorage";
+
+function buildInitialLists() {
+  return mergePublishedServiceWithLists(
+    initialActiveServices,
+    initialInactiveServices,
+  );
+}
 
 export default function EmprendedorServiciosListPage() {
-  const [activeList, setActiveList] =
-    useState<EmprendedorService[]>(initialActiveServices);
+  const initialLists = useMemo(() => buildInitialLists(), []);
+  const [activeList, setActiveList] = useState<EmprendedorService[]>(
+    initialLists.activeServices,
+  );
   const [inactiveList, setInactiveList] = useState<EmprendedorService[]>(
-    initialInactiveServices,
+    initialLists.inactiveServices,
   );
   const [alertVariant, setAlertVariant] = useState<ServiceAlertVariant | null>(
     null,
@@ -39,6 +54,9 @@ export default function EmprendedorServiciosListPage() {
         { ...service, status: "inactivo" },
         ...inactive,
       ]);
+      if (isPublishedServiceId(serviceId)) {
+        updatePublishedServiceActive(false);
+      }
       return prev.filter((s) => s.id !== serviceId);
     });
     setAlertVariant("deactivate-success");
@@ -52,6 +70,9 @@ export default function EmprendedorServiciosListPage() {
         { ...service, status: "activo" },
         ...active,
       ]);
+      if (isPublishedServiceId(serviceId)) {
+        updatePublishedServiceActive(true);
+      }
       return prev.filter((s) => s.id !== serviceId);
     });
   }, []);
@@ -63,6 +84,9 @@ export default function EmprendedorServiciosListPage() {
 
   const handleConfirmDelete = useCallback(() => {
     if (!pendingDeleteId) return;
+    if (isPublishedServiceId(pendingDeleteId)) {
+      clearPublishedService();
+    }
     setInactiveList((prev) => prev.filter((s) => s.id !== pendingDeleteId));
     setPendingDeleteId(null);
     setAlertVariant("delete-success");

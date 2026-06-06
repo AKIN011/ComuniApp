@@ -404,7 +404,7 @@ export default function EmprendedorCrearServicios() {
 
   const handleVerServicios = () => {
     setShowPublishModal(false);
-    navigate(ROUTES.entrepreneur.resultadoCargue);
+    navigate(ROUTES.entrepreneur.servicios);
   };
 
   const handleDraft = () => {

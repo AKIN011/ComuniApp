@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router";
 import { Clock, Megaphone, Plus, Pencil } from "lucide-react";
 import {
@@ -12,9 +13,17 @@ import {
   dashboardPublishedServices,
   EMPRENDEDOR_USER_NAME,
 } from "../app/components/emprendedor/emprendedorData";
+import { mergePublishedServiceWithLists } from "../app/utils/emprendedorServicioStorage";
 import { EMPRENDEDOR_ROUTES } from "../lib/emprendedorRoutes";
 
 export default function EmprendedorDashboardPage() {
+  const publishedServices = useMemo(
+    () =>
+      mergePublishedServiceWithLists(dashboardPublishedServices, [])
+        .activeServices,
+    [],
+  );
+
   return (
     <div data-name="EMPRENDEDOR DASHBOARD">
       <div className="mb-8 flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
@@ -85,7 +94,7 @@ export default function EmprendedorDashboardPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {dashboardPublishedServices.map((service) => (
+          {publishedServices.map((service) => (
             <DashboardServiceCard key={service.id} service={service} />
           ))}
           <GrowBusinessCard />

@@ -28,7 +28,6 @@ export const ROUTES = {
     servicios: "/emprendedor/servicios",
     crearServicio: "/emprendedor/servicios/crear",
     editarPerfil: "/emprendedor/perfil/editar",
-    resultadoCargue: "/emprendedor/resultado-cargue-serv",
     /** @deprecated use crearServicio */
     crearServiciosLegacy: "/emprendedor/crear-servicios",
     /** @deprecated use servicios */
