@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { Clock, Megaphone, Plus, Pencil } from "lucide-react";
+import { EmprendedorProfileCompletionModal } from "../app/components/emprendedor/EmprendedorProfileCompletionModal";
 import {
   DashboardServiceCard,
   GrowBusinessCard,
@@ -17,11 +18,16 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { buildEmprendedorServiceLists } from "../app/utils/emprendedorServicioStorage";
 import { EMPRENDEDOR_ROUTES } from "../lib/emprendedorRoutes";
+import { isEntrepreneurProfileComplete } from "../lib/auth/profile";
+
+const PROFILE_COMPLETION_DISMISS_KEY = "comuniapp_profile_completion_dismissed";
 
 export default function EmprendedorDashboardPage() {
-  const { user } = useAuth();
+  const { user, getCurrentProfile } = useAuth();
   const location = useLocation();
   const [refreshToken, setRefreshToken] = useState(0);
+  const [showProfileCompletionModal, setShowProfileCompletionModal] =
+    useState(false);
 
   const publishedServices = useMemo(
     () =>
@@ -35,6 +41,28 @@ export default function EmprendedorDashboardPage() {
   useEffect(() => {
     setRefreshToken((token) => token + 1);
   }, [location.key]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const profile = getCurrentProfile();
+    if (!profile || isEntrepreneurProfileComplete(profile)) return;
+
+    const dismissKey = `${PROFILE_COMPLETION_DISMISS_KEY}_${user.id}`;
+    if (sessionStorage.getItem(dismissKey) === "true") return;
+
+    setShowProfileCompletionModal(true);
+  }, [user, getCurrentProfile]);
+
+  const handleDismissProfileCompletion = () => {
+    if (user) {
+      sessionStorage.setItem(
+        `${PROFILE_COMPLETION_DISMISS_KEY}_${user.id}`,
+        "true",
+      );
+    }
+    setShowProfileCompletionModal(false);
+  };
 
   return (
     <div data-name="EMPRENDEDOR DASHBOARD">
@@ -122,6 +150,12 @@ export default function EmprendedorDashboardPage() {
           </Link>
         </p>
       </section>
+
+      {showProfileCompletionModal && (
+        <EmprendedorProfileCompletionModal
+          onClose={handleDismissProfileCompletion}
+        />
+      )}
     </div>
   );
 }

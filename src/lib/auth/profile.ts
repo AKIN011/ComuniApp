@@ -33,6 +33,23 @@ function writeProfiles(profiles: Record<string, UserProfileData>): void {
   localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(profiles));
 }
 
+function normalizeProfile(profile: Partial<UserProfileData>): UserProfileData {
+  return {
+    firstName: profile.firstName?.trim() ?? "",
+    lastName: profile.lastName?.trim() ?? "",
+    phone: profile.phone?.trim() ?? "",
+    businessDescription: profile.businessDescription?.trim() ?? "",
+    profession: profile.profession?.trim() ?? "",
+    officeLocation: profile.officeLocation?.trim() ?? "",
+    whatsapp: profile.whatsapp?.trim() ?? "",
+    verifiedBadge: profile.verifiedBadge?.trim() ?? "",
+    tags: Array.isArray(profile.tags)
+      ? profile.tags.map((tag) => tag.trim()).filter(Boolean)
+      : [],
+    profilePhotoUrl: profile.profilePhotoUrl?.trim() ?? "",
+  };
+}
+
 export function buildDisplayName(profile: UserProfileData): string {
   return `${profile.firstName.trim()} ${profile.lastName.trim()}`.trim();
 }
@@ -43,11 +60,7 @@ export function getUserProfile(userId: string): UserProfileData | null {
 
   if (!profile) return null;
 
-  return {
-    firstName: profile.firstName ?? "",
-    lastName: profile.lastName ?? "",
-    phone: profile.phone ?? "",
-  };
+  return normalizeProfile(profile);
 }
 
 export function getProfileForUser(user: SessionUser): UserProfileData {
@@ -56,11 +69,41 @@ export function getProfileForUser(user: SessionUser): UserProfileData {
 
   const nameParts = user.name.trim().split(/\s+/);
 
-  return {
+  return normalizeProfile({
     firstName: user.firstName ?? nameParts[0] ?? "",
     lastName: user.lastName ?? nameParts.slice(1).join(" ") ?? "",
     phone: user.phone ?? "",
-  };
+  });
+}
+
+export function getEntrepreneurProfileMissingFields(
+  profile: UserProfileData,
+): string[] {
+  const missing: string[] = [];
+
+  if (!profile.businessDescription?.trim()) {
+    missing.push("businessDescription");
+  }
+  if (!profile.profession?.trim()) {
+    missing.push("profession");
+  }
+  if (!profile.officeLocation?.trim()) {
+    missing.push("officeLocation");
+  }
+  if (!profile.whatsapp?.trim()) {
+    missing.push("whatsapp");
+  }
+  if (!profile.tags?.length) {
+    missing.push("tags");
+  }
+
+  return missing;
+}
+
+export function isEntrepreneurProfileComplete(
+  profile: UserProfileData,
+): boolean {
+  return getEntrepreneurProfileMissingFields(profile).length === 0;
 }
 
 export function validateProfileForm(
@@ -106,11 +149,31 @@ export function saveUserProfile(
   }
 
   const profiles = readProfiles();
-  profiles[userId] = {
-    firstName: profile.firstName.trim(),
-    lastName: profile.lastName.trim(),
-    phone: profile.phone.trim(),
+  const existing = profiles[userId];
+  const merged: Partial<UserProfileData> = {
+    ...existing,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    phone: profile.phone,
   };
+
+  const optionalFields = [
+    "businessDescription",
+    "profession",
+    "officeLocation",
+    "whatsapp",
+    "verifiedBadge",
+    "tags",
+    "profilePhotoUrl",
+  ] as const;
+
+  for (const field of optionalFields) {
+    if (profile[field] !== undefined) {
+      merged[field] = profile[field];
+    }
+  }
+
+  profiles[userId] = normalizeProfile(merged);
 
   writeProfiles(profiles);
 

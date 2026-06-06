@@ -1,702 +1,38 @@
-import React, { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
-import { ROUTES } from "../routes/paths";
-import svgPaths from "../imports/ResidenteRegistro1-1/svg-e44tleatyp";
+import { Eye, EyeOff, Lock, Mail, Shield, ShieldCheck, Store, Users } from "lucide-react";
+
+import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
 import { ProfileConfirmationModal } from "../app/components/ProfileConfirmationModal";
+import { SiteFooterLinks } from "../app/components/layout/SiteFooterLinks";
+import { ROUTES } from "../routes/paths";
 import { registerNewUser } from "../lib/auth/credentials";
 import { type LoginFieldErrors } from "../lib/auth/validation";
 
-interface RegisterFormProps {
-  email: string;
-  password: string;
-  showPassword: boolean;
-  fieldErrors: LoginFieldErrors;
-  submitError: string;
-  isSubmitting: boolean;
-  onEmailChange: (value: string) => void;
-  onPasswordChange: (value: string) => void;
-  onTogglePassword: () => void;
-  onSubmit: (e: FormEvent) => void;
-}
-
-function Container2() {
+function RegisterFooter() {
   return (
-    <div className="h-[28.75px] relative shrink-0 w-[30px]" data-name="Container">
-      <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 30 28.75">
-        <g id="Container">
-          <path d={svgPaths.p17161d00} fill="var(--fill-0, white)" id="Icon" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function Background() {
-  return (
-    <div className="content-stretch flex items-center justify-center relative rounded-[48px] shrink-0 size-[48px]" style={{ backgroundImage: "linear-gradient(135deg, rgb(0, 64, 223) 0%, rgb(45, 91, 255) 100%)" }} data-name="Background">
-      <div className="-translate-y-1/2 absolute bg-[rgba(255,255,255,0)] left-0 rounded-[48px] shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)] size-[48px] top-1/2" data-name="Overlay+Shadow" />
-      <Container2 />
-    </div>
-  );
-}
-
-function Container3() {
-  return (
-    <div className="content-stretch flex flex-col items-start relative shrink-0" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[30px] tracking-[-0.75px] whitespace-nowrap">
-        <p className="leading-[36px]">ComuniApp</p>
-      </div>
-    </div>
-  );
-}
-
-function Container1() {
-  return (
-    <div className="content-stretch flex gap-[12px] items-center relative self-stretch shrink-0" data-name="Container">
-      <Background />
-      <Container3 />
-    </div>
-  );
-}
-
-function LogoAnchor() {
-  return (
-    <div className="content-stretch flex h-[48px] items-start justify-center relative shrink-0 w-full" data-name="Logo Anchor">
-      <Container1 />
-    </div>
-  );
-}
-
-function Heading() {
-  return (
-    <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Heading 1">
-      <div className="[word-break:break-word] flex flex-col font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[#0d1c2e] text-[24px] tracking-[-0.6px] w-full">
-        <p className="leading-[32px]">Bienvenido de nuevo</p>
-      </div>
-    </div>
-  );
-}
-
-function Container5() {
-  return (
-    <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Medium',sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#434656] text-[14px] w-full">
-        <p className="leading-[20px]">Por favor, introduzca sus datos para registrarse.</p>
-      </div>
-    </div>
-  );
-}
-
-function Container4() {
-  return (
-    <div className="relative shrink-0 w-full" data-name="Container">
-      <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col gap-[8px] items-start relative size-full">
-        <Heading />
-        <Container5 />
-      </div>
-    </div>
-  );
-}
-
-function Label() {
-  return (
-    <div className="content-stretch flex flex-col items-start relative shrink-0 w-full md:w-[362px]" data-name="Label">
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[14px] whitespace-nowrap">
-        <p className="leading-[20px]">Dirección de correo electrónico</p>
-      </div>
-    </div>
-  );
-}
-
-function Container7({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px overflow-clip relative" data-name="Container">
-      <input
-        type="email"
-        autoComplete="email"
-        placeholder="name@company.com"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="[word-break:break-word] bg-transparent outline-none flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[normal] not-italic relative shrink-0 text-[16px] text-[#0d1c2e] placeholder:text-[rgba(116,118,136,0.6)] w-full"
-      />
-    </div>
-  );
-}
-
-function Input({
-  email,
-  onEmailChange,
-}: {
-  email: string;
-  onEmailChange: (value: string) => void;
-}) {
-  return (
-    <div className="bg-[#eff4ff] relative rounded-[32px] shrink-0 w-full" data-name="Input">
-      <div className="flex flex-row justify-center overflow-clip rounded-[inherit] size-full">
-        <div className="content-stretch flex items-start justify-center pl-[48px] pr-[16px] py-[16px] relative size-full">
-          <Container7 value={email} onChange={onEmailChange} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Container8() {
-  return (
-    <div className="absolute bottom-[26.92%] content-stretch flex flex-col items-start left-[16px] top-[26.92%] pointer-events-none" data-name="Container">
-      <div className="h-[16px] relative shrink-0 w-[20px]" data-name="Icon">
-        <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 16">
-          <path d={svgPaths.p13e73800} fill="var(--fill-0, #747688)" id="Icon" />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
-function Container6({
-  email,
-  onEmailChange,
-}: {
-  email: string;
-  onEmailChange: (value: string) => void;
-}) {
-  return (
-    <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <Input email={email} onEmailChange={onEmailChange} />
-      <Container8 />
-    </div>
-  );
-}
-
-function EmailField({
-  email,
-  onEmailChange,
-  error,
-}: {
-  email: string;
-  onEmailChange: (value: string) => void;
-  error?: string;
-}) {
-  return (
-    <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Email Field">
-      <Label />
-      <Container6 email={email} onEmailChange={onEmailChange} />
-      {error && (
-        <p
-          role="alert"
-          className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
-        >
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function Label1() {
-  return (
-    <div className="content-stretch flex flex-col items-start relative shrink-0" data-name="Label">
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#0d1c2e] text-[14px] whitespace-nowrap">
-        <p className="leading-[20px]">Contraseña</p>
-      </div>
-    </div>
-  );
-}
-
-function Container9() {
-  return (
-    <div className="relative shrink-0 w-full" data-name="Container">
-      <div className="flex flex-row items-center size-full">
-        <div className="content-stretch flex items-center justify-between px-[4px] relative size-full">
-          <Label1 />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Container11({
-  value,
-  onChange,
-  showPassword,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  showPassword: boolean;
-}) {
-  return (
-    <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px overflow-clip relative" data-name="Container">
-      <input
-        type={showPassword ? "text" : "password"}
-        autoComplete="new-password"
-        placeholder="••••••••"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="[word-break:break-word] bg-transparent outline-none flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[normal] not-italic relative shrink-0 text-[16px] text-[#0d1c2e] placeholder:text-[rgba(116,118,136,0.6)] w-full"
-      />
-    </div>
-  );
-}
-
-function Input1({
-  password,
-  onPasswordChange,
-  showPassword,
-}: {
-  password: string;
-  onPasswordChange: (value: string) => void;
-  showPassword: boolean;
-}) {
-  return (
-    <div className="bg-[#eff4ff] relative rounded-[32px] shrink-0 w-full" data-name="Input">
-      <div className="flex flex-row justify-center overflow-clip rounded-[inherit] size-full">
-        <div className="content-stretch flex items-start justify-center px-[48px] py-[16px] relative size-full">
-          <Container11
-            value={password}
-            onChange={onPasswordChange}
-            showPassword={showPassword}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Container12() {
-  return (
-    <div className="absolute bottom-[26.92%] content-stretch flex flex-col items-start left-[16px] top-[26.92%] pointer-events-none" data-name="Container">
-      <div className="h-[21px] relative shrink-0 w-[16px]" data-name="Icon">
-        <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 21">
-          <path d={svgPaths.p12930f00} fill="var(--fill-0, #747688)" id="Icon" />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
-function Container13() {
-  return (
-    <div className="h-[12.5px] relative shrink-0 w-[18.333px]" data-name="Container">
-      <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18.3333 12.5">
-        <g id="Container">
-          <path d={svgPaths.p2e870a60} fill="var(--fill-0, #747688)" id="Icon" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function Button({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label="Mostrar u ocultar contraseña"
-      className="absolute cursor-pointer bottom-[37.75%] content-stretch flex flex-col items-center justify-center right-[16px] top-[37.75%] border-none outline-none bg-transparent p-0"
-      data-name="Button"
-    >
-      <Container13 />
-    </button>
-  );
-}
-
-function Container10({
-  password,
-  onPasswordChange,
-  showPassword,
-  onTogglePassword,
-}: {
-  password: string;
-  onPasswordChange: (value: string) => void;
-  showPassword: boolean;
-  onTogglePassword: () => void;
-}) {
-  return (
-    <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Container">
-      <Input1
-        password={password}
-        onPasswordChange={onPasswordChange}
-        showPassword={showPassword}
-      />
-      <Container12 />
-      <Button onClick={onTogglePassword} />
-    </div>
-  );
-}
-
-function PasswordField({
-  password,
-  onPasswordChange,
-  showPassword,
-  onTogglePassword,
-  error,
-}: {
-  password: string;
-  onPasswordChange: (value: string) => void;
-  showPassword: boolean;
-  onTogglePassword: () => void;
-  error?: string;
-}) {
-  return (
-    <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-name="Password Field">
-      <Container9 />
-      <Container10
-        password={password}
-        onPasswordChange={onPasswordChange}
-        showPassword={showPassword}
-        onTogglePassword={onTogglePassword}
-      />
-      {error && (
-        <p
-          role="alert"
-          className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
-        >
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function ButtonPrimaryLoginAction({ isSubmitting }: { isSubmitting: boolean }) {
-  return (
-    <button
-      type="submit"
-      disabled={isSubmitting}
-      className="bg-gradient-to-r cursor-pointer content-stretch flex from-[#0040df] items-center justify-center py-[16px] relative rounded-[9999px] shrink-0 to-[#2d5bff] w-full border-none outline-none disabled:cursor-not-allowed disabled:opacity-70"
-      data-name="Button - Primary Login Action"
-    >
-      <div className="absolute bg-[rgba(255,255,255,0)] inset-0 rounded-[9999px] shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.2),0px_4px_6px_-4px_rgba(0,64,223,0.2)]" data-name="Button - Primary Login Action:shadow" />
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[16px] text-center text-white whitespace-nowrap">
-        <p className="leading-[24px]">{isSubmitting ? "Registrando..." : "Regístrate"}</p>
-      </div>
-    </button>
-  );
-}
-
-function Form({ formProps }: { formProps: RegisterFormProps }) {
-  return (
-    <form
-      className="relative shrink-0 w-full"
-      data-name="Form"
-      onSubmit={formProps.onSubmit}
-      noValidate
-    >
-      <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col gap-[24px] items-start relative size-full">
-        {formProps.submitError && (
-          <p
-            role="alert"
-            className="w-full rounded-[12px] bg-[#fef2f2] px-4 py-3 text-center font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#b91c1c]"
-          >
-            {formProps.submitError}
+    <footer className="mt-auto w-full bg-[#eff4ff] px-8 py-12">
+      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-6">
+        <div className="flex flex-col gap-4">
+          <span className="font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[20px] font-bold leading-[28px] text-[#0d1c2e]">
+            ComuniApp
+          </span>
+          <p className="font-['Inter:Regular',sans-serif] text-[14px] leading-[20px] text-[rgba(13,28,46,0.7)]">
+            © 2024 ComuniApp. Cultivando el comercio comunitario.
           </p>
-        )}
-        <EmailField
-          email={formProps.email}
-          onEmailChange={formProps.onEmailChange}
-          error={formProps.fieldErrors.email}
-        />
-        <PasswordField
-          password={formProps.password}
-          onPasswordChange={formProps.onPasswordChange}
-          showPassword={formProps.showPassword}
-          onTogglePassword={formProps.onTogglePassword}
-          error={formProps.fieldErrors.password}
-        />
-        <ButtonPrimaryLoginAction isSubmitting={formProps.isSubmitting} />
-      </div>
-    </form>
-  );
-}
-
-function Margin() {
-  return (
-    <div className="content-stretch flex flex-col items-start px-[16px] relative shrink-0" data-name="Margin">
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[#c4c5d9] text-[12px] tracking-[1.2px] uppercase whitespace-nowrap">
-        <p className="leading-[16px]">o</p>
-      </div>
-    </div>
-  );
-}
-
-function Divider() {
-  return (
-    <div className="relative shrink-0 w-full" data-name="Divider">
-      <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center pt-[8px] relative size-full">
-        <div className="flex-[1_0_0] h-px min-w-px relative" data-name="Horizontal Divider">
-          <div aria-hidden className="absolute border-0 border-[rgba(196,197,217,0.2)] border-solid inset-0 pointer-events-none" />
         </div>
-        <Margin />
-        <div className="flex-[1_0_0] h-px min-w-px relative" data-name="Horizontal Divider">
-          <div aria-hidden className="absolute border-0 border-[rgba(196,197,217,0.2)] border-solid inset-0 pointer-events-none" />
+        <div className="flex flex-wrap gap-8">
+          <SiteFooterLinks />
         </div>
       </div>
-    </div>
+    </footer>
   );
 }
 
-function Paragraph() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex gap-[4px] items-start justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-center w-full whitespace-nowrap" data-name="Paragraph">
-      <div className="flex flex-col font-['Inter:Medium',sans-serif] font-medium justify-center relative shrink-0 text-[#434656]">
-        <p className="leading-[20px]">¿Ya tienes una cuenta?</p>
-      </div>
-      <Link
-        to="/login"
-        className="flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center relative shrink-0 text-[#0040df] cursor-pointer bg-transparent border-none p-0 outline-none no-underline hover:underline"
-      >
-        <p className="leading-[20px]">Inicia Sesión</p>
-      </Link>
-    </div>
-  );
-}
+const inputBaseClass =
+  "h-[52px] w-full rounded-[14px] border-none bg-[#eef4fc] pl-12 pr-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30";
 
-function Container14() {
-  return (
-    <div className="relative shrink-0 w-full" data-name="Container">
-      <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-center relative size-full">
-        <div className="[word-break:break-word] flex flex-col font-['Inter:Medium',sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#434656] text-[12px] text-center tracking-[0.6px] uppercase whitespace-nowrap">
-          <p className="leading-[16px]">¿ERES PROPIETARIO DE UN NEGOCIO LOCAL?</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Container15() {
-  return (
-    <div className="h-[18px] relative shrink-0 w-[20.094px]" data-name="Container">
-      <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20.0939 18">
-        <g id="Container">
-          <path d={svgPaths.p725c500} fill="var(--fill-0, #2A1700)" id="Icon" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function Button1({ onEmprendedor }: { onEmprendedor: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onEmprendedor}
-      className="relative w-full shrink-0 cursor-pointer rounded-[32px] border-none bg-[#ffddb8] outline-none transition-opacity hover:opacity-80"
-      data-name="Button"
-    >
-      <div className="flex size-full flex-row items-center justify-center">
-        <div className="relative flex size-full content-stretch items-center justify-center gap-[12px] border-0 border-solid border-[transparent] bg-clip-padding px-[16px] py-[14px]">
-          <Container15 />
-          <div className="relative flex shrink-0 flex-col justify-center [word-break:break-word] font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold not-italic leading-[0] text-[#2a1700]">
-            <p className="whitespace-nowrap leading-[24px]">Únete como emprendedor</p>
-          </div>
-        </div>
-      </div>
-    </button>
-  );
-}
-
-function HorizontalBorder({ onEmprendedor }: { onEmprendedor: () => void }) {
-  return (
-    <div className="content-stretch flex flex-col gap-[16px] items-start pt-[17px] relative shrink-0 w-full" data-name="HorizontalBorder">
-      <div aria-hidden className="absolute border-[rgba(196,197,217,0.1)] border-solid border-t inset-0 pointer-events-none" />
-      <Container14 />
-      <Button1 onEmprendedor={onEmprendedor} />
-    </div>
-  );
-}
-
-function SecondaryActions({ onEmprendedor }: { onEmprendedor: () => void }) {
-  return (
-    <div className="relative shrink-0 w-full" data-name="Secondary Actions">
-      <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col gap-[16px] items-start pt-[8px] relative size-full">
-        <Paragraph />
-        <HorizontalBorder onEmprendedor={onEmprendedor} />
-      </div>
-    </div>
-  );
-}
-
-function LoginCard({
-  formProps,
-  onEmprendedor,
-}: {
-  formProps: RegisterFormProps;
-  onEmprendedor: () => void;
-}) {
-  return (
-    <div className="bg-white drop-shadow-[0px_20px_20px_rgba(13,28,46,0.06)] relative rounded-[48px] shrink-0 w-full" data-name="Login Card">
-      <div aria-hidden className="absolute border border-[rgba(196,197,217,0.1)] border-solid inset-0 pointer-events-none rounded-[48px]" />
-      <div className="content-stretch flex flex-col gap-[32px] items-start pb-[49px] pt-[41px] px-[24px] sm:px-[41px] relative size-full">
-        <Container4 />
-        <Form formProps={formProps} />
-        <Divider />
-        <SecondaryActions onEmprendedor={onEmprendedor} />
-      </div>
-    </div>
-  );
-}
-
-function Container16() {
-  return (
-    <div className="h-[30px] relative shrink-0 w-[24px]" data-name="Container">
-      <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 30">
-        <g id="Container">
-          <path d={svgPaths.p3d5d680} fill="var(--fill-0, #0D1C2E)" id="Icon" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function Container17() {
-  return (
-    <div className="h-[30px] relative shrink-0 w-[24px]" data-name="Container">
-      <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 30">
-        <g id="Container">
-          <path d={svgPaths.p15b21300} fill="var(--fill-0, #0D1C2E)" id="Icon" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function Container18() {
-  return (
-    <div className="h-[24px] relative shrink-0 w-[33px]" data-name="Container">
-      <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 33 24">
-        <g id="Container">
-          <path d={svgPaths.p212b3d00} fill="var(--fill-0, #0D122E)" id="Icon" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function TrustBadges() {
-  return (
-    <div className="content-stretch flex gap-[32px] items-center justify-center opacity-40 relative shrink-0 w-full" data-name="Trust Badges">
-      <div aria-hidden className="absolute bg-white inset-0 mix-blend-saturation pointer-events-none" />
-      <Container16 />
-      <Container17 />
-      <Container18 />
-    </div>
-  );
-}
-
-function Container({
-  formProps,
-  onEmprendedor,
-}: {
-  formProps: RegisterFormProps;
-  onEmprendedor: () => void;
-}) {
-  return (
-    <div className="content-stretch flex flex-col gap-[40px] items-start w-full max-w-[448px] relative shrink-0" data-name="Container">
-      <LogoAnchor />
-      <LoginCard formProps={formProps} onEmprendedor={onEmprendedor} />
-      <TrustBadges />
-    </div>
-  );
-}
-
-function MainTopAppBarSuppressedForLoginJourneyAsPerSemanticShellMandate({
-  formProps,
-  onEmprendedor,
-}: {
-  formProps: RegisterFormProps;
-  onEmprendedor: () => void;
-}) {
-  return (
-    <div className="relative shrink-0 w-full flex-grow z-[2] min-h-[calc(100vh-152px)] flex flex-col justify-center" data-name="Main - TopAppBar Suppressed for Login Journey as per Semantic Shell Mandate">
-      <div className="flex flex-row items-center justify-center overflow-clip rounded-[inherit] size-full">
-        <div className="content-stretch flex items-center justify-center p-[24px] relative size-full">
-           <div className="absolute bg-[#e6eeff] blur-[60px] bottom-1/2 left-[-5%] opacity-60 right-[65%] rounded-[9999px] top-[-10%]" data-name="Minimalist Background Decoration" />
-          <Container formProps={formProps} onEmprendedor={onEmprendedor} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Paragraph1() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex flex-col gap-[8px] items-start leading-[0] not-italic relative shrink-0 whitespace-nowrap" data-name="Paragraph">
-      <div className="flex flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold justify-center relative shrink-0 text-[#0d1c2e] text-[20px]">
-        <p className="leading-[28px]">ComuniApp</p>
-      </div>
-      <div className="flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center relative shrink-0 text-[14px] text-[rgba(13,28,46,0.7)]">
-        <p className="leading-[20px]">© 2024 ComuniApp. Cultivando el comercio comunitario.</p>
-      </div>
-    </div>
-  );
-}
-
-function Link1() {
-  return (
-    <Link to={ROUTES.privacy} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
-        <p className="leading-[20px]">Política de privacidad</p>
-      </div>
-    </Link>
-  );
-}
-
-function Link3() {
-  return (
-    <Link to={ROUTES.help} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
-        <p className="leading-[20px]">Centro de ayuda</p>
-      </div>
-    </Link>
-  );
-}
-
-function Link4() {
-  return (
-    <Link to={ROUTES.contact} className="content-stretch flex flex-col items-start relative self-stretch shrink-0 no-underline" data-name="Link">
-      <div className="[word-break:break-word] flex flex-col font-['Inter:Regular',sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#475569] hover:text-[#0040df] text-[14px] whitespace-nowrap transition-colors">
-        <p className="leading-[20px]">Contáctenos</p>
-      </div>
-    </Link>
-  );
-}
-
-function Nav() {
-  return (
-    <div className="content-stretch flex gap-[24px] items-start relative shrink-0 flex-wrap" data-name="Nav">
-      <Link1 />
-      <Link3 />
-      <Link4 />
-    </div>
-  );
-}
-
-function FooterComponentExecution() {
-  return (
-    <div className="bg-[#eff4ff] relative shrink-0 w-full flex justify-center" data-name="Footer Component Execution">
-      <div className="flex flex-row items-center max-w-[1280px] w-full size-full">
-        <div className="content-stretch flex flex-col md:flex-row gap-6 md:gap-0 items-center justify-between px-[32px] py-[48px] relative size-full">
-          <Paragraph1 />
-          <Nav />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FooterComponentExecutionMargin() {
-  return (
-    <div className="content-stretch flex flex-col items-start pt-[80px] relative shrink-0 w-full z-[1]" data-name="Footer Component Execution:margin">
-      <FooterComponentExecution />
-    </div>
-  );
-}
+const inputErrorClass = "ring-2 ring-[#ef4444]/40 bg-[#fef2f2]";
 
 export default function ResidenteRegistro() {
   const navigate = useNavigate();
@@ -708,10 +44,9 @@ export default function ResidenteRegistro() {
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleRegister = (e: FormEvent) => {
+  const handleRegister = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitError("");
-
     setIsSubmitting(true);
 
     const result = registerNewUser(email, password, "resident");
@@ -727,45 +62,192 @@ export default function ResidenteRegistro() {
     setShowWelcomeModal(true);
   };
 
-  const formProps: RegisterFormProps = {
-    email,
-    password,
-    showPassword,
-    fieldErrors,
-    submitError,
-    isSubmitting,
-    onEmailChange: (value) => {
-      setEmail(value);
-      if (fieldErrors.email) {
-        setFieldErrors((prev) => ({ ...prev, email: undefined }));
-      }
-    },
-    onPasswordChange: (value) => {
-      setPassword(value);
-      if (fieldErrors.password) {
-        setFieldErrors((prev) => ({ ...prev, password: undefined }));
-      }
-    },
-    onTogglePassword: () => setShowPassword((prev) => !prev),
-    onSubmit: handleRegister,
-  };
-
   const continueToProfile = () => {
     setShowWelcomeModal(false);
     navigate("/registro/crear-perfil");
   };
 
-  const goToEmprendedorRegistro = () => {
-    navigate("/registro/emprendedor");
-  };
-
   return (
-    <div className="content-stretch flex flex-col min-h-screen isolate items-start relative size-full" style={{ backgroundImage: "linear-gradient(90deg, rgb(248, 249, 255) 0%, rgb(248, 249, 255) 100%), linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%)" }} data-name="RESIDENTE REGISTRO 1">
-      <MainTopAppBarSuppressedForLoginJourneyAsPerSemanticShellMandate
-        formProps={formProps}
-        onEmprendedor={goToEmprendedorRegistro}
-      />
-      <FooterComponentExecutionMargin />
+    <div className="flex min-h-screen flex-col bg-[#f8f9ff]">
+      <div className="flex flex-1 flex-col items-center px-4 pb-8 pt-10">
+        <header className="mb-10">
+          <ComuniAppLogo className="justify-center" />
+        </header>
+
+        <main className="w-full max-w-[480px]">
+          <div className="rounded-[24px] bg-white px-8 py-10 shadow-[0px_20px_40px_0px_rgba(13,28,46,0.06)]">
+            <div className="mb-8 text-center">
+              <h1 className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[28px] font-extrabold leading-[36px] tracking-[-0.5px] text-[#0d1c2e]">
+                Bienvenido de nuevo
+              </h1>
+              <div className="mt-3 flex justify-center">
+                <span className="inline-block rounded-full bg-[#eff4ff] px-4 py-1.5 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold uppercase leading-[20px] tracking-[0.08em] text-[#2d5bff]">
+                  Residente
+                </span>
+              </div>
+              <p className="mt-3 font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#64748b]">
+                Por favor, introduzca sus datos para registrarse.
+              </p>
+            </div>
+
+            <form className="flex flex-col gap-5" onSubmit={handleRegister} noValidate>
+              {submitError && (
+                <p
+                  role="alert"
+                  className="rounded-[12px] bg-[#fef2f2] px-4 py-3 text-center font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#b91c1c]"
+                >
+                  {submitError}
+                </p>
+              )}
+
+              <div className="flex flex-col gap-2">
+                <label
+                  className="font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#334155]"
+                  htmlFor="email"
+                >
+                  Dirección de correo electrónico
+                </label>
+                <div className="relative">
+                  <Mail
+                    aria-hidden
+                    className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#94a3b8]"
+                  />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="name@company.com"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (fieldErrors.email) {
+                        setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                      }
+                    }}
+                    aria-invalid={Boolean(fieldErrors.email)}
+                    aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                    className={`${inputBaseClass} ${fieldErrors.email ? inputErrorClass : ""}`}
+                  />
+                </div>
+                {fieldErrors.email && (
+                  <p
+                    id="email-error"
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.email}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label
+                  className="font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#334155]"
+                  htmlFor="password"
+                >
+                  Contraseña
+                </label>
+                <div className="relative">
+                  <Lock
+                    aria-hidden
+                    className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#94a3b8]"
+                  />
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (fieldErrors.password) {
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          password: undefined,
+                        }));
+                      }
+                    }}
+                    aria-invalid={Boolean(fieldErrors.password)}
+                    aria-describedby={
+                      fieldErrors.password ? "password-error" : undefined
+                    }
+                    className={`${inputBaseClass} pr-12 ${fieldErrors.password ? inputErrorClass : ""}`}
+                  />
+                  <button
+                    type="button"
+                    aria-label={
+                      showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                    }
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#94a3b8] transition-colors hover:text-[#64748b]"
+                    onClick={() => setShowPassword((v) => !v)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-5" />
+                    ) : (
+                      <Eye className="size-5" />
+                    )}
+                  </button>
+                </div>
+                {fieldErrors.password && (
+                  <p
+                    id="password-error"
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.password}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="mt-2 h-[52px] w-full cursor-pointer rounded-[9999px] bg-[#2d5bff] font-['Plus_Jakarta_Sans:Bold',sans-serif] text-[16px] font-bold leading-[24px] text-white shadow-[0px_10px_15px_-3px_rgba(0,64,223,0.25),0px_4px_6px_-4px_rgba(0,64,223,0.2)] transition-all duration-200 hover:bg-[#1a4de8] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSubmitting ? "Registrando…" : "Regístrate"}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center font-['Inter:Regular',sans-serif] text-[14px] leading-[20px] text-[#64748b]">
+              <span className="text-[#94a3b8]">o</span>
+            </p>
+
+            <p className="mt-4 text-center font-['Inter:Regular',sans-serif] text-[14px] leading-[22px] text-[#64748b]">
+              ¿Ya tienes una cuenta?{" "}
+              <Link
+                className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#2d5bff] transition-colors hover:text-[#1a4de8]"
+                to={ROUTES.login}
+              >
+                Inicia sesión
+              </Link>
+            </p>
+
+            <div className="mt-8 border-t border-[#e2e8f0] pt-8">
+              <p className="text-center font-['Inter:Medium',sans-serif] text-[11px] font-medium uppercase leading-[16px] tracking-[0.08em] text-[#94a3b8]">
+                ¿Eres propietario de un negocio local?
+              </p>
+              <Link
+                to={ROUTES.registerEntrepreneur}
+                className="mt-4 flex h-[48px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[#fce8d5] font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold leading-[22px] text-[#9a6b45] no-underline transition-all duration-200 hover:bg-[#f9dcc0] active:scale-[0.98]"
+              >
+                <Store className="size-5" strokeWidth={2} />
+                Únete como emprendedor
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-8 flex items-center justify-center gap-10 text-[#cbd5e1]">
+            <ShieldCheck className="size-7" strokeWidth={1.5} />
+            <Shield className="size-7" strokeWidth={1.5} />
+            <Users className="size-7" strokeWidth={1.5} />
+          </div>
+        </main>
+      </div>
+
+      <RegisterFooter />
+
       {showWelcomeModal && (
         <ProfileConfirmationModal
           message="¡Bienvenido! Continúa para completar tu perfil en ComuniApp."

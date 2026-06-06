@@ -104,7 +104,12 @@ export default function LoginEmprendedorPage() {
               <h1 className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[28px] font-extrabold leading-[36px] tracking-[-0.5px] text-[#0d1c2e]">
                 Bienvenido de nuevo
               </h1>
-              <p className="mt-2 font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#64748b]">
+              <div className="mt-3 flex justify-center">
+                <span className="inline-block rounded-full bg-[#eff4ff] px-4 py-1.5 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold uppercase leading-[20px] tracking-[0.08em] text-[#2d5bff]">
+                  Emprendedor
+                </span>
+              </div>
+              <p className="mt-3 font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#64748b]">
                 Por favor, introduzca sus datos para iniciar sesión.
               </p>
             </div>

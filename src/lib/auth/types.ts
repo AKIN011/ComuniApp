@@ -4,6 +4,13 @@ export interface UserProfileData {
   firstName: string;
   lastName: string;
   phone: string;
+  businessDescription?: string;
+  profession?: string;
+  officeLocation?: string;
+  whatsapp?: string;
+  verifiedBadge?: string;
+  tags?: string[];
+  profilePhotoUrl?: string;
 }
 
 export interface SessionUser {

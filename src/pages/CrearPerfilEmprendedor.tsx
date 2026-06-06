@@ -277,6 +277,7 @@ export default function CrearPerfilEmprendedor() {
       firstName: nombres.trim(),
       lastName: apellidos.trim(),
       phone: celular.trim(),
+      businessDescription: descripcion.trim(),
     });
 
     if (!result.success) {

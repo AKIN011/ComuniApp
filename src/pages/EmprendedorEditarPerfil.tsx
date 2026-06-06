@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../routes/paths";
 import { useAuth } from "../context/AuthContext";
-import { buildDisplayName } from "../lib/auth/profile";
+import {
+  buildDisplayName,
+  isEntrepreneurProfileComplete,
+} from "../lib/auth/profile";
 import {
   Check,
   LineChart,
@@ -12,18 +15,9 @@ import {
   Phone,
   Share2,
 } from "lucide-react";
+import defaultProfilePhoto from "../assets/emprendedor-default-profile.png";
 
-const DEFAULT_TAGS = [
-  "Planificación urbana",
-  "Estrategia de Impacto",
-  "Compromiso Comunitario",
-  "Energía Renovable",
-  "Informes ESG",
-  "Certificación B-Corp",
-];
-
-const DEFAULT_MISSION =
-  "Proporcionar soluciones eléctricas seguras y eficientes para hogares y negocios locales, priorizando la calidad y la satisfacción del cliente en cada proyecto.";
+const DEFAULT_PROFILE_PHOTO = defaultProfilePhoto;
 
 type EditSection =
   | "photo"
@@ -112,18 +106,17 @@ export default function EmprendedorEditarPerfil() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [saveError, setSaveError] = useState("");
 
-  const [profilePhoto, setProfilePhoto] = useState(
-    "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400&q=80",
-  );
-  const [verifiedBadge, setVerifiedBadge] = useState("TECNICO VERIFICADO");
+  const [profilePhoto, setProfilePhoto] = useState(DEFAULT_PROFILE_PHOTO);
+  const [verifiedBadge, setVerifiedBadge] = useState("");
   const [name, setName] = useState("");
-  const [profession, setProfession] = useState("Electricista");
-  const [mission, setMission] = useState(DEFAULT_MISSION);
+  const [profession, setProfession] = useState("");
+  const [mission, setMission] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [officeLocation, setOfficeLocation] = useState("CR 35 #12 -10, El Remanso");
-  const [whatsapp, setWhatsapp] = useState("wa.link/d5ihkd");
-  const [tags, setTags] = useState<string[]>(DEFAULT_TAGS);
+  const [officeLocation, setOfficeLocation] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
   const [newTag, setNewTag] = useState("");
 
   const handlePhotoChange = (file: File | undefined) => {
@@ -139,9 +132,21 @@ export default function EmprendedorEditarPerfil() {
     if (!user) return;
 
     const profile = getCurrentProfile();
-    setName(profile ? buildDisplayName(profile) : user.name);
-    setPhone(profile?.phone ?? user.phone ?? "");
+    if (!profile) return;
+
+    setName(buildDisplayName(profile) || user.name);
+    setPhone(profile.phone || user.phone || "");
     setEmail(user.email);
+    setMission(profile.businessDescription ?? "");
+    setProfession(profile.profession ?? "");
+    setOfficeLocation(profile.officeLocation ?? "");
+    setWhatsapp(profile.whatsapp ?? "");
+    setVerifiedBadge(profile.verifiedBadge ?? "");
+    setTags(profile.tags ?? []);
+    if (profile.profilePhotoUrl) {
+      setProfilePhoto(profile.profilePhotoUrl);
+    }
+    setShowCompletionBanner(!isEntrepreneurProfileComplete(profile));
   }, [user, getCurrentProfile]);
 
   useEffect(() => {
@@ -154,10 +159,27 @@ export default function EmprendedorEditarPerfil() {
     setSaveError("");
 
     const { firstName, lastName } = splitFullName(name);
+    const currentProfile = getCurrentProfile();
+    const storedPhotoUrl = currentProfile?.profilePhotoUrl ?? "";
+    let profilePhotoUrl: string | undefined = profilePhoto;
+
+    if (profilePhoto.startsWith("blob:")) {
+      profilePhotoUrl = storedPhotoUrl || undefined;
+    } else if (profilePhoto === DEFAULT_PROFILE_PHOTO && !storedPhotoUrl) {
+      profilePhotoUrl = undefined;
+    }
+
     const result = updateProfile({
       firstName,
       lastName,
       phone: phone.trim(),
+      businessDescription: mission.trim(),
+      profession: profession.trim(),
+      officeLocation: officeLocation.trim(),
+      whatsapp: whatsapp.trim(),
+      verifiedBadge: verifiedBadge.trim(),
+      tags,
+      profilePhotoUrl,
     });
 
     if (!result.success) {
@@ -165,6 +187,10 @@ export default function EmprendedorEditarPerfil() {
       return;
     }
 
+    const updatedProfile = getCurrentProfile();
+    setShowCompletionBanner(
+      updatedProfile ? !isEntrepreneurProfileComplete(updatedProfile) : false,
+    );
     setShowSuccessModal(true);
   };
 
@@ -194,13 +220,29 @@ export default function EmprendedorEditarPerfil() {
         </p>
       </header>
 
+      {showCompletionBanner && (
+        <div className="mb-8 rounded-[16px] border border-[#bfdbfe] bg-[#eff4ff] px-5 py-4">
+          <p className="font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold text-[#0d1c2e]">
+            Tu perfil aún no está completo
+          </p>
+          <p className="mt-1 font-['Inter:Regular',sans-serif] text-[14px] leading-[22px] text-[#475569]">
+            Completa la misión, tu profesión, contacto y etiquetas para destacar
+            mejor en la comunidad.
+          </p>
+        </div>
+      )}
+
       <section className="mb-8 flex flex-col gap-6 xl:flex-row xl:items-start">
           <div className="relative shrink-0">
             <div className="size-[180px] overflow-hidden rounded-[24px] bg-[#eef4fc] sm:size-[200px] xl:size-[220px]">
               <img
                 src={profilePhoto}
                 alt={name}
-                className="size-full object-cover"
+                className={`size-full ${
+                  profilePhoto === DEFAULT_PROFILE_PHOTO
+                    ? "object-contain p-4"
+                    : "object-cover"
+                }`}
               />
             </div>
             <input
@@ -234,17 +276,20 @@ export default function EmprendedorEditarPerfil() {
 
           <div className="flex flex-1 flex-col gap-4">
             <div className="flex flex-wrap items-center gap-3">
-              {editingSection === "header" ? (
-                <input
-                  type="text"
-                  value={verifiedBadge}
-                  onChange={(e) => setVerifiedBadge(e.target.value)}
-                  className="rounded-full bg-[#dcfce7] px-3 py-1 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#15803d] outline-none ring-2 ring-[#2d5bff]/30"
-                />
-              ) : (
-                <span className="rounded-full bg-[#dcfce7] px-3 py-1 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#15803d]">
-                  {verifiedBadge}
-                </span>
+              {(editingSection === "header" || verifiedBadge.trim()) && (
+                editingSection === "header" ? (
+                  <input
+                    type="text"
+                    value={verifiedBadge}
+                    onChange={(e) => setVerifiedBadge(e.target.value)}
+                    placeholder="Ej. Técnico verificado"
+                    className="rounded-full bg-[#dcfce7] px-3 py-1 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#15803d] outline-none ring-2 ring-[#2d5bff]/30"
+                  />
+                ) : (
+                  <span className="rounded-full bg-[#dcfce7] px-3 py-1 font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold uppercase tracking-wide text-[#15803d]">
+                    {verifiedBadge}
+                  </span>
+                )
               )}
               <EditPencilButton
                 active={editingSection === "header"}
@@ -267,17 +312,24 @@ export default function EmprendedorEditarPerfil() {
                   type="text"
                   value={profession}
                   onChange={(e) => setProfession(e.target.value)}
+                  placeholder="Ej. Electricista"
                   className={`${inputClass} text-[#2d5bff]`}
                 />
               </div>
             ) : (
               <>
                 <h1 className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[28px] font-extrabold leading-[36px] tracking-[-0.5px] text-[#0d1c2e] md:text-[32px] md:leading-[40px]">
-                  {name}
+                  {name || "Sin nombre"}
                 </h1>
-                <p className="font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-[#2d5bff] md:text-[18px]">
-                  {profession}
-                </p>
+                {profession.trim() ? (
+                  <p className="font-['Inter:Semi_Bold',sans-serif] text-[16px] font-semibold text-[#2d5bff] md:text-[18px]">
+                    {profession}
+                  </p>
+                ) : (
+                  <p className="font-['Inter:Regular',sans-serif] text-[15px] italic text-[#94a3b8]">
+                    Agrega tu profesión u oficio
+                  </p>
+                )}
               </>
             )}
 
@@ -299,11 +351,16 @@ export default function EmprendedorEditarPerfil() {
                   value={mission}
                   onChange={(e) => setMission(e.target.value)}
                   rows={4}
+                  placeholder="Cuéntanos sobre tu negocio"
                   className={`${inputClass} resize-y bg-[#f8f9ff]`}
                 />
-              ) : (
+              ) : mission.trim() ? (
                 <p className="font-['Inter:Regular',sans-serif] text-[14px] leading-[22px] text-[#475569]">
                   {mission}
+                </p>
+              ) : (
+                <p className="font-['Inter:Regular',sans-serif] text-[14px] italic leading-[22px] text-[#94a3b8]">
+                  Aún no has agregado la misión de tu negocio
                 </p>
               )}
             </div>
@@ -367,7 +424,7 @@ export default function EmprendedorEditarPerfil() {
                 onChange={setPhone}
               />
               <ContactField
-                label="Ubicación de la oficina"
+                label="Ubicación"
                 icon={MapPin}
                 value={officeLocation}
                 editing={editingSection === "contact"}
@@ -379,6 +436,7 @@ export default function EmprendedorEditarPerfil() {
                 value={whatsapp}
                 editing={editingSection === "contact"}
                 onChange={setWhatsapp}
+                placeholder="wa.link"
               />
             </div>
           </div>
@@ -460,6 +518,11 @@ export default function EmprendedorEditarPerfil() {
             </div>
 
             <div className="mb-4 flex flex-wrap gap-2">
+              {tags.length === 0 && editingSection !== "skills" && (
+                <p className="font-['Inter:Regular',sans-serif] text-[14px] italic text-[#94a3b8]">
+                  Agrega etiquetas para describir tu experiencia
+                </p>
+              )}
               {tags.map((tag) =>
                 editingSection === "skills" ? (
                   <span
@@ -543,12 +606,14 @@ function ContactField({
   value,
   editing,
   onChange,
+  placeholder,
 }: {
   label: string;
   icon: typeof Mail;
   value: string;
   editing: boolean;
   onChange: (v: string) => void;
+  placeholder?: string;
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -562,11 +627,16 @@ function ContactField({
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
             className="w-full rounded-[8px] bg-[#eef4fc] px-2 py-1 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold text-[#0d1c2e] outline-none ring-2 ring-[#2d5bff]/30"
           />
-        ) : (
+        ) : value.trim() ? (
           <span className="font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold text-[#0d1c2e]">
             {value}
+          </span>
+        ) : (
+          <span className="font-['Inter:Regular',sans-serif] text-[14px] italic text-[#94a3b8]">
+            {placeholder ?? "Sin completar"}
           </span>
         )}
       </div>
