@@ -13,6 +13,7 @@ import {
   fileToDataUrl,
   saveServiceEdit,
 } from "../app/utils/emprendedorServicioStorage";
+import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
 import {
   ArrowLeft,
   Camera,
@@ -25,6 +26,17 @@ import {
 
 const MAX_IMAGES = 10;
 const MAX_FILE_SIZE_MB = 10;
+
+const inputBaseClass =
+  "w-full rounded-[16px] bg-[#eef4fc] px-5 py-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30";
+
+const inputErrorClass = "ring-2 ring-[#ef4444]/40 bg-[#fef2f2]";
+
+type ServiceFieldErrors = {
+  title?: string;
+  description?: string;
+  images?: string;
+};
 
 type ServiceImage = {
   file?: File;
@@ -73,13 +85,7 @@ function PageHeader({
   return (
     <header className="sticky top-0 z-30 border-b border-[#e8eef8] bg-[#f8f9ff]/95 backdrop-blur-sm">
       <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-6 md:px-8">
-        <Link
-          to="/"
-          className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[22px] font-extrabold leading-[28px] tracking-[-0.5px]"
-        >
-          <span className="text-[#2d5bff]">Comuni</span>
-          <span className="text-[#22c55e]">App</span>
-        </Link>
+        <ComuniAppLogo to={ROUTES.entrepreneur.tablero} />
 
         <div className="relative" ref={menuRef}>
           <button
@@ -224,6 +230,8 @@ export default function EmprendedorEditarServicios() {
   const [active, setActive] = useState(true);
   const [images, setImages] = useState<ServiceImage[]>([]);
   const [dragOver, setDragOver] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ServiceFieldErrors>({});
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -260,6 +268,7 @@ export default function EmprendedorEditarServicios() {
       }));
       return [...prev, ...toAdd];
     });
+    setFieldErrors((prev) => ({ ...prev, images: undefined }));
   }, []);
 
   useEffect(() => {
@@ -282,11 +291,27 @@ export default function EmprendedorEditarServicios() {
   }
 
   const handleUpdate = async () => {
+    const errors: ServiceFieldErrors = {};
+
     if (!title.trim()) {
-      setStatusMessage("Ingresa un título para el servicio.");
+      errors.title = "El título es obligatorio.";
+    }
+    if (!description.trim()) {
+      errors.description = "La descripción es obligatoria.";
+    }
+    if (images.length === 0) {
+      errors.images = "Agrega al menos una imagen del servicio.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setStatusMessage(null);
+      setFieldErrors(errors);
+      setFormError("Revisa los campos marcados.");
       return;
     }
 
+    setFormError("");
+    setFieldErrors({});
     setStatusMessage(null);
     setIsSaving(true);
 
@@ -309,7 +334,7 @@ export default function EmprendedorEditarServicios() {
 
       setShowUpdateModal(true);
     } catch {
-      setStatusMessage("No se pudo actualizar el servicio. Inténtalo de nuevo.");
+      setFormError("No se pudo actualizar el servicio. Inténtalo de nuevo.");
     } finally {
       setIsSaving(false);
     }
@@ -343,6 +368,15 @@ export default function EmprendedorEditarServicios() {
             </p>
           </div>
 
+          {formError && (
+            <p
+              role="alert"
+              className="mb-6 rounded-[12px] bg-[#fef2f2] px-4 py-3 font-['Inter:Medium',sans-serif] text-[14px] font-medium text-[#b91c1c]"
+            >
+              {formError}
+            </p>
+          )}
+
           {statusMessage && (
             <div
               role="status"
@@ -365,10 +399,28 @@ export default function EmprendedorEditarServicios() {
                   id="edit-service-title"
                   type="text"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    if (fieldErrors.title) {
+                      setFieldErrors((prev) => ({ ...prev, title: undefined }));
+                    }
+                  }}
                   placeholder="e.g., Jardinería Urbana Profesional"
-                  className="w-full rounded-[16px] bg-[#eef4fc] px-5 py-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30"
+                  aria-invalid={Boolean(fieldErrors.title)}
+                  aria-describedby={
+                    fieldErrors.title ? "edit-service-title-error" : undefined
+                  }
+                  className={`${inputBaseClass} ${fieldErrors.title ? inputErrorClass : ""}`}
                 />
+                {fieldErrors.title && (
+                  <p
+                    id="edit-service-title-error"
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.title}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">
@@ -381,11 +433,34 @@ export default function EmprendedorEditarServicios() {
                 <textarea
                   id="edit-service-description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    if (fieldErrors.description) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        description: undefined,
+                      }));
+                    }
+                  }}
                   rows={6}
                   placeholder="Describe lo que hace que tu servicio sea único..."
-                  className="w-full resize-y rounded-[16px] bg-[#eef4fc] px-5 py-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30"
+                  aria-invalid={Boolean(fieldErrors.description)}
+                  aria-describedby={
+                    fieldErrors.description
+                      ? "edit-service-description-error"
+                      : undefined
+                  }
+                  className={`${inputBaseClass} resize-y ${fieldErrors.description ? inputErrorClass : ""}`}
                 />
+                {fieldErrors.description && (
+                  <p
+                    id="edit-service-description-error"
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.description}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">
@@ -420,9 +495,11 @@ export default function EmprendedorEditarServicios() {
                   onDragLeave={() => setDragOver(false)}
                   onDrop={handleDrop}
                   className={`flex cursor-pointer flex-col items-center justify-center rounded-[16px] border-2 border-dashed px-6 py-12 transition-colors ${
-                    dragOver
-                      ? "border-[#2d5bff] bg-[#dce9ff]"
-                      : "border-[#c5d9f5] bg-[#eef4fc]"
+                    fieldErrors.images
+                      ? "border-[#ef4444] bg-[#fef2f2]"
+                      : dragOver
+                        ? "border-[#2d5bff] bg-[#dce9ff]"
+                        : "border-[#c5d9f5] bg-[#eef4fc]"
                   }`}
                 >
                   <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-[#dce9ff]">
@@ -459,10 +536,16 @@ export default function EmprendedorEditarServicios() {
                                   e.stopPropagation();
                                   setImages((prev) => {
                                     const next = [...prev];
-                                    URL.revokeObjectURL(next[i].url);
+                                    if (next[i].url.startsWith("blob:")) {
+                                      URL.revokeObjectURL(next[i].url);
+                                    }
                                     next.splice(i, 1);
                                     return next;
                                   });
+                                  setFieldErrors((prev) => ({
+                                    ...prev,
+                                    images: undefined,
+                                  }));
                                 }}
                                 className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-[#0d1c2e]/70 text-[10px] text-white"
                               >
@@ -477,6 +560,14 @@ export default function EmprendedorEditarServicios() {
                     },
                   )}
                 </div>
+                {fieldErrors.images && (
+                  <p
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.images}
+                  </p>
+                )}
               </div>
             </div>
 

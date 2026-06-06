@@ -116,9 +116,14 @@ export default function RegistroEmprendedor() {
           <div className="rounded-[24px] bg-white px-8 py-10 shadow-[0px_20px_40px_0px_rgba(13,28,46,0.06)]">
             <div className="mb-8 text-center">
               <h1 className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[28px] font-extrabold leading-[36px] tracking-[-0.5px] text-[#0d1c2e]">
-                Bienvenido
+                Bienvenido de nuevo
               </h1>
-              <p className="mt-2 font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#64748b]">
+              <div className="mt-3 flex justify-center">
+                <span className="inline-block rounded-full bg-[#eff4ff] px-4 py-1.5 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold uppercase leading-[20px] tracking-[0.08em] text-[#2d5bff]">
+                  Emprendedor
+                </span>
+              </div>
+              <p className="mt-3 font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#64748b]">
                 Por favor, introduzca sus datos para registrarse.
               </p>
             </div>
@@ -176,20 +181,12 @@ export default function RegistroEmprendedor() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between gap-2">
-                  <label
-                    className="font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#334155]"
-                    htmlFor="emprendedor-password"
-                  >
-                    Contraseña
-                  </label>
-                  <button
-                    type="button"
-                    className="font-['Inter:Medium',sans-serif] text-[13px] font-medium leading-[20px] text-[#2d5bff] transition-colors hover:text-[#1a4de8]"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </button>
-                </div>
+                <label
+                  className="font-['Inter:Medium',sans-serif] text-[14px] font-medium leading-[20px] text-[#334155]"
+                  htmlFor="emprendedor-password"
+                >
+                  Contraseña
+                </label>
                 <div className="relative">
                   <Lock
                     aria-hidden

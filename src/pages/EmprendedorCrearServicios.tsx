@@ -21,6 +21,7 @@ import {
   fileToDataUrl,
   savePublishedService,
 } from "../app/utils/emprendedorServicioStorage";
+import { ComuniAppLogo } from "../app/components/ComuniAppLogo";
 
 function randomServiceId() {
   return Math.floor(1000 + Math.random() * 9000);
@@ -42,6 +43,18 @@ const SALUD_SUBCATEGORIES = [
 
 const MAX_IMAGES = 10;
 const MAX_FILE_SIZE_MB = 10;
+
+const inputBaseClass =
+  "w-full rounded-[16px] bg-[#eef4fc] px-5 py-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30";
+
+const inputErrorClass = "ring-2 ring-[#ef4444]/40 bg-[#fef2f2]";
+
+type ServiceFieldErrors = {
+  title?: string;
+  description?: string;
+  category?: string;
+  images?: string;
+};
 
 function useClickOutside(
   ref: RefObject<HTMLElement | null>,
@@ -85,13 +98,7 @@ function PageHeader({
   return (
     <header className="sticky top-0 z-30 border-b border-[#e8eef8] bg-[#f8f9ff]/95 backdrop-blur-sm">
       <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-6 md:px-8">
-        <Link
-          to="/"
-          className="font-['Plus_Jakarta_Sans:ExtraBold',sans-serif] text-[22px] font-extrabold leading-[28px] tracking-[-0.5px]"
-        >
-          <span className="text-[#2d5bff]">Comuni</span>
-          <span className="text-[#22c55e]">App</span>
-        </Link>
+        <ComuniAppLogo to={ROUTES.entrepreneur.tablero} />
 
         <div className="relative" ref={menuRef}>
           <button
@@ -126,10 +133,12 @@ function CategoryDropdown({
   value,
   subcategory,
   onChange,
+  hasError = false,
 }: {
   value: string;
   subcategory: string;
   onChange: (category: string, sub: string) => void;
+  hasError?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [saludHovered, setSaludHovered] = useState(false);
@@ -151,7 +160,7 @@ function CategoryDropdown({
         aria-expanded={open}
         aria-haspopup="listbox"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-[9999px] bg-white px-5 py-3 font-['Inter:Regular',sans-serif] text-[14px] text-[#0d1c2e] outline-none transition-shadow hover:shadow-sm focus:ring-2 focus:ring-[#2d5bff]/30"
+        className={`flex w-full items-center justify-between rounded-[9999px] bg-white px-5 py-3 font-['Inter:Regular',sans-serif] text-[14px] text-[#0d1c2e] outline-none transition-shadow hover:shadow-sm focus:ring-2 focus:ring-[#2d5bff]/30 ${hasError ? inputErrorClass : ""}`}
       >
         <span className={value ? "text-[#0d1c2e]" : "text-[#94a3b8]"}>
           {displayLabel}
@@ -333,6 +342,8 @@ export default function EmprendedorCrearServicios() {
   const [active, setActive] = useState(true);
   const [images, setImages] = useState<{ file: File; url: string }[]>([]);
   const [dragOver, setDragOver] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ServiceFieldErrors>({});
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishedServiceId, setPublishedServiceId] = useState<number | null>(
@@ -355,6 +366,7 @@ export default function EmprendedorCrearServicios() {
       }));
       return [...prev, ...toAdd];
     });
+    setFieldErrors((prev) => ({ ...prev, images: undefined }));
   }, []);
 
   useEffect(() => {
@@ -371,19 +383,30 @@ export default function EmprendedorCrearServicios() {
   };
 
   const handlePublish = async () => {
+    const errors: ServiceFieldErrors = {};
+
     if (!title.trim()) {
-      setStatusMessage("Ingresa un título para el servicio.");
-      return;
+      errors.title = "El título es obligatorio.";
+    }
+    if (!description.trim()) {
+      errors.description = "La descripción es obligatoria.";
     }
     if (!category) {
-      setStatusMessage("Selecciona una categoría.");
-      return;
+      errors.category = "Selecciona una categoría.";
     }
     if (images.length === 0) {
-      setStatusMessage("Agrega al menos una imagen del servicio.");
+      errors.images = "Agrega al menos una imagen del servicio.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setStatusMessage(null);
+      setFieldErrors(errors);
+      setFormError("Revisa los campos marcados.");
       return;
     }
 
+    setFormError("");
+    setFieldErrors({});
     const serviceId = randomServiceId();
     const imageUrl = await fileToDataUrl(images[0].file);
 
@@ -408,6 +431,8 @@ export default function EmprendedorCrearServicios() {
   };
 
   const handleDraft = () => {
+    setFormError("");
+    setFieldErrors({});
     setStatusMessage(
       title.trim()
         ? `Borrador guardado: "${title.trim()}".`
@@ -442,6 +467,15 @@ export default function EmprendedorCrearServicios() {
             </p>
           </div>
 
+          {formError && (
+            <p
+              role="alert"
+              className="mb-6 rounded-[12px] bg-[#fef2f2] px-4 py-3 font-['Inter:Medium',sans-serif] text-[14px] font-medium text-[#b91c1c]"
+            >
+              {formError}
+            </p>
+          )}
+
           {statusMessage && (
             <div
               role="status"
@@ -465,10 +499,28 @@ export default function EmprendedorCrearServicios() {
                   id="service-title"
                   type="text"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    if (fieldErrors.title) {
+                      setFieldErrors((prev) => ({ ...prev, title: undefined }));
+                    }
+                  }}
                   placeholder="e.g., Jardinería Urbana Profesional"
-                  className="w-full rounded-[16px] bg-[#eef4fc] px-5 py-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30"
+                  aria-invalid={Boolean(fieldErrors.title)}
+                  aria-describedby={
+                    fieldErrors.title ? "service-title-error" : undefined
+                  }
+                  className={`${inputBaseClass} ${fieldErrors.title ? inputErrorClass : ""}`}
                 />
+                {fieldErrors.title && (
+                  <p
+                    id="service-title-error"
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.title}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">
@@ -481,11 +533,34 @@ export default function EmprendedorCrearServicios() {
                 <textarea
                   id="service-description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                    if (fieldErrors.description) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        description: undefined,
+                      }));
+                    }
+                  }}
                   rows={6}
                   placeholder="Describe lo que hace que tu servicio sea único..."
-                  className="w-full resize-y rounded-[16px] bg-[#eef4fc] px-5 py-4 font-['Inter:Regular',sans-serif] text-[15px] text-[#0d1c2e] outline-none placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#2d5bff]/30"
+                  aria-invalid={Boolean(fieldErrors.description)}
+                  aria-describedby={
+                    fieldErrors.description
+                      ? "service-description-error"
+                      : undefined
+                  }
+                  className={`${inputBaseClass} resize-y ${fieldErrors.description ? inputErrorClass : ""}`}
                 />
+                {fieldErrors.description && (
+                  <p
+                    id="service-description-error"
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.description}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">
@@ -520,9 +595,11 @@ export default function EmprendedorCrearServicios() {
                   onDragLeave={() => setDragOver(false)}
                   onDrop={handleDrop}
                   className={`flex cursor-pointer flex-col items-center justify-center rounded-[16px] border-2 border-dashed px-6 py-12 transition-colors ${
-                    dragOver
-                      ? "border-[#2d5bff] bg-[#dce9ff]"
-                      : "border-[#c5d9f5] bg-[#eef4fc]"
+                    fieldErrors.images
+                      ? "border-[#ef4444] bg-[#fef2f2]"
+                      : dragOver
+                        ? "border-[#2d5bff] bg-[#dce9ff]"
+                        : "border-[#c5d9f5] bg-[#eef4fc]"
                   }`}
                 >
                   <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-[#dce9ff]">
@@ -563,6 +640,10 @@ export default function EmprendedorCrearServicios() {
                                     next.splice(i, 1);
                                     return next;
                                   });
+                                  setFieldErrors((prev) => ({
+                                    ...prev,
+                                    images: undefined,
+                                  }));
                                 }}
                                 className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-[#0d1c2e]/70 text-[10px] text-white"
                               >
@@ -577,6 +658,14 @@ export default function EmprendedorCrearServicios() {
                     },
                   )}
                 </div>
+                {fieldErrors.images && (
+                  <p
+                    role="alert"
+                    className="font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.images}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -589,11 +678,23 @@ export default function EmprendedorCrearServicios() {
                 <CategoryDropdown
                   value={category}
                   subcategory={subcategory}
+                  hasError={Boolean(fieldErrors.category)}
                   onChange={(cat, sub) => {
                     setCategory(cat);
                     setSubcategory(sub);
+                    if (fieldErrors.category) {
+                      setFieldErrors((prev) => ({ ...prev, category: undefined }));
+                    }
                   }}
                 />
+                {fieldErrors.category && (
+                  <p
+                    role="alert"
+                    className="mt-2 font-['Inter:Regular',sans-serif] text-[13px] leading-[18px] text-[#dc2626]"
+                  >
+                    {fieldErrors.category}
+                  </p>
+                )}
 
                 <div className="mt-6 flex items-center justify-between gap-4 border-t border-[#dce9ff] pt-5">
                   <div>

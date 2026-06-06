@@ -190,7 +190,17 @@ export default function LoginPage() {
 
               </h1>
 
-              <p className="mt-2 font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#64748b]">
+              <div className="mt-3 flex justify-center">
+
+                <span className="inline-block rounded-full bg-[#eff4ff] px-4 py-1.5 font-['Inter:Semi_Bold',sans-serif] text-[14px] font-semibold uppercase leading-[20px] tracking-[0.08em] text-[#2d5bff]">
+
+                  Residente
+
+                </span>
+
+              </div>
+
+              <p className="mt-3 font-['Inter:Regular',sans-serif] text-[15px] leading-[22px] text-[#64748b]">
 
                 Por favor, introduzca sus datos para iniciar sesión.
 
@@ -492,7 +502,7 @@ export default function LoginPage() {
 
               </p>
               <Link
-                to="/registro/emprendedor"
+                to={ROUTES.loginEntrepreneur}
                 className="mt-4 flex h-[48px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[#fce8d5] font-['Inter:Semi_Bold',sans-serif] text-[15px] font-semibold leading-[22px] text-[#9a6b45] no-underline transition-all duration-200 hover:bg-[#f9dcc0] active:scale-[0.98]"
               >
 
