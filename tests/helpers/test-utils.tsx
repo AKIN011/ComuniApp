@@ -43,3 +43,19 @@ export function renderApp(route = "/") {
     </AuthProvider>,
   );
 }
+
+/** Monta la app con ruta y estado de navegación (p. ej. editar servicio). */
+export function renderAppWithState(
+  pathname: string,
+  state: Record<string, unknown> | null = null,
+) {
+  const router = createMemoryRouter(appRoutes, {
+    initialEntries: [{ pathname, state }],
+  });
+
+  return render(
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>,
+  );
+}

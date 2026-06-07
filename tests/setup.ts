@@ -26,6 +26,14 @@ function ensureWebStorage() {
 
 ensureWebStorage();
 
+if (typeof URL.createObjectURL !== "function") {
+  URL.createObjectURL = vi.fn(() => "blob:http://localhost/mock");
+}
+
+if (typeof URL.revokeObjectURL !== "function") {
+  URL.revokeObjectURL = vi.fn();
+}
+
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();

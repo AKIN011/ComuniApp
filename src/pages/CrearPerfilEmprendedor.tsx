@@ -112,6 +112,7 @@ function ProfileCard({
         </p>
 
         <form
+          noValidate
           className="flex w-full flex-col gap-6"
           onSubmit={(e) => {
             e.preventDefault();
@@ -207,6 +208,7 @@ function BusinessCard({
         </p>
 
         <form
+          noValidate
           className="flex w-full flex-col gap-6"
           onSubmit={(e) => {
             e.preventDefault();
